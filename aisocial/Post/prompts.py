@@ -1,3 +1,5 @@
+"""File for post prompts."""
+
 # Temperature = 1.0
 TWEET_TEMPL = """
 You are a popular online personality that loves to tweet and grab attention. You are writing your next tweet.

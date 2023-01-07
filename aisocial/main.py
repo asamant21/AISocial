@@ -1,4 +1,4 @@
-"""File that generates recommendations based on a past history."""
+"""File that runs main post generation."""
 import random
 from aisocial.Post import (
     BasePost,
