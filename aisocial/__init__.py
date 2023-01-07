@@ -1,7 +1,8 @@
-from langchain.prompts import PromptTemplate
+import os
+
 from langchain.chains import LLMChain
 from langchain.llms import OpenAI
-import os
+from langchain.prompts import PromptTemplate
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 BASE_PROMPT = PromptTemplate(template="{question}\n:", input_variables=["question"])

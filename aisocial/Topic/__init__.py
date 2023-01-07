@@ -1,6 +1,7 @@
-from aisocial.Topic.base import BaseTopic
-from aisocial.Topic.generate import generate_topics, format_topics_for_prompt
 from typing import Dict, List
+
+from aisocial.Topic.base import BaseTopic
+from aisocial.Topic.generate import format_topics_for_prompt, generate_topics
 
 topic_cache: Dict[str, BaseTopic] = {}
 MAX_TOPICS = 10
@@ -12,9 +13,7 @@ def retrieve_seed_topics() -> List[BaseTopic]:
     # TODO: make this smarter
     topics = list(topic_cache.values())
     seed_topics = sorted(
-        topics,
-        key=lambda topic: topic.recommendation_rating,
-        reverse=True
+        topics, key=lambda topic: topic.recommendation_rating, reverse=True
     )
     return seed_topics[:MAX_TOPICS]
 

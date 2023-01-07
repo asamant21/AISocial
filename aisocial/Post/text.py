@@ -1,5 +1,6 @@
 """Base Class for a Text Post."""
 from pydantic import BaseModel, Extra
+
 from aisocial.Post.base import BasePost, ContentType
 
 

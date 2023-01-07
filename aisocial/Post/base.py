@@ -3,9 +3,10 @@ from abc import abstractmethod
 from datetime import datetime
 from enum import Enum
 from typing import List
-from aisocial.Topic import topic_cache
 
 from pydantic import BaseModel, Extra
+
+from aisocial.Topic import topic_cache
 
 
 class ContentType(str, Enum):

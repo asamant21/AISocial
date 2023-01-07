@@ -7,7 +7,6 @@ from langchain.llms import OpenAI
 import aisocial
 from aisocial.Topic.base import BaseTopic
 
-
 llm = OpenAI(
     model_name="text-davinci-003",
     temperature=1.0,
@@ -66,4 +65,3 @@ def format_topics_for_prompt(topics: List[BaseTopic]) -> str:
     for id, topic in enumerate(topics):
         final_str += f"{id+1}. {topic.name}\n"
     return final_str
-

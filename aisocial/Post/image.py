@@ -1,9 +1,11 @@
 """Base Class for an Image Post."""
-from pydantic import BaseModel, Extra
 import urllib.request
-from PIL import Image
-from aisocial.Post.base import BasePost, ContentType
+
 from IPython.display import display
+from PIL import Image
+from pydantic import BaseModel, Extra
+
+from aisocial.Post.base import BasePost, ContentType
 
 
 class ImagePost(BasePost, BaseModel):
@@ -23,5 +25,3 @@ class ImagePost(BasePost, BaseModel):
         urllib.request.urlretrieve(self.content, post_name)
         img = Image.open(post_name)
         display(img)
-
-

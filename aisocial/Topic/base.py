@@ -1,5 +1,6 @@
 """Base Class for a Topic."""
 from typing import Any
+
 from pydantic import BaseModel, Extra
 
 

@@ -1,13 +1,8 @@
 """File that runs main post generation."""
 import random
-from aisocial.Post import (
-    BasePost,
-    generate_text_post,
-    generate_image_post,
-)
-from aisocial.Topic import (
-    retrieve_seed_topics
-)
+
+from aisocial.Post import BasePost, generate_image_post, generate_text_post
+from aisocial.Topic import retrieve_seed_topics
 
 
 def generate_post() -> BasePost:

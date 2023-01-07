@@ -1,23 +1,19 @@
 """File that generates recommendations based on a past history."""
-from typing import List
 import re
+from typing import List
 
-from aisocial.Post.prompts import (
-    IMAGE_PROMPT_TEMPL_BASE,
-    IMAGE_PROMPT_TEMPL_END
-)
-from aisocial import clean_parsed_output, chain
+from aisocial import chain, clean_parsed_output
+from aisocial.Post.prompts import (IMAGE_PROMPT_TEMPL_BASE,
+                                   IMAGE_PROMPT_TEMPL_END)
+from aisocial.Topic import format_topics_for_prompt
 from aisocial.Topic.base import BaseTopic
-from aisocial.Topic import (
-    format_topics_for_prompt,
-)
 
 
 def generate_image_prompt(topics: List[BaseTopic]) -> str:
     """Generate image prompt."""
     formatted_topics = format_topics_for_prompt(topics)
     image_base = IMAGE_PROMPT_TEMPL_BASE.format(topics=formatted_topics)
-    image_question = image_base+IMAGE_PROMPT_TEMPL_END
+    image_question = image_base + IMAGE_PROMPT_TEMPL_END
     llm_response = chain(inputs={"question": image_question})
     return parse_image_rec_to_prompt(llm_response["text"])
 
