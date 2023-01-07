@@ -9,6 +9,9 @@ from aisocial.Post.base import BasePost, ContentType
 
 
 class ImagePost(BasePost, BaseModel):
+
+    prompt: str
+
     class Config:
         """Configuration for this pydantic object."""
 

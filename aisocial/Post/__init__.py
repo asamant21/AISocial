@@ -54,6 +54,7 @@ def generate_image_post(topics: List[BaseTopic]) -> ImagePost:
         topics=topic_names,
         content=response_url,
         created_time=datetime.now(),
+        prompt=image_prompt,
     )
     post_cache[post_id] = image_post
     return image_post
