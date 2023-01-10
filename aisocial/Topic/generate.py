@@ -1,18 +1,8 @@
 """Helpers for generating and choosing topics."""
 from typing import List
 
-from langchain.chains import LLMChain
-from langchain.llms import OpenAI
-
-import aisocial
+from aisocial import chain
 from aisocial.Topic.base import BaseTopic
-
-llm = OpenAI(
-    model_name="text-davinci-003",
-    temperature=1.0,
-    openai_api_key=aisocial.OPENAI_API_KEY,
-)
-chain = LLMChain(llm=llm, prompt=aisocial.BASE_PROMPT)
 
 # Temperature = 1.0
 EXTRA_TOPICS_TEMPL = """
