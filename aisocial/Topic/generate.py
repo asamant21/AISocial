@@ -1,7 +1,7 @@
 """Helpers for generating and choosing topics."""
 from typing import List
 
-from aisocial import chain
+from aisocial import chain, clean_parsed_output
 from aisocial.Topic.base import BaseTopic
 
 # Temperature = 1.0
@@ -32,6 +32,7 @@ def parse_llm_topic_output(llm_output: str) -> List[BaseTopic]:
     llm_output = llm_output.strip()
     llm_output = llm_output.strip("[]")
     topic_names = llm_output.split(",")
+    topic_names = [clean_parsed_output(topic_name).lower() for topic_name in topic_names]
 
     topic_list = []
     for topic_name in topic_names:

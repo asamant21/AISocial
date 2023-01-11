@@ -1,25 +1,34 @@
 from typing import Dict, List
-
+import numpy as np
 from aisocial.Topic.base import BaseTopic
 from aisocial.Topic.generate import format_topics_for_prompt, generate_topics
 
 topic_cache: Dict[str, BaseTopic] = {}
-MAX_TOPICS = 10
+MAX_TOPICS = 5
 USER_REC_ADJUSTMENT = 2
+
+
+def construct_topic_probability_dist(topics: List[BaseTopic]) -> List[float]:
+    """Construct topic probability distribution."""
+    total_rec_sum = sum([topic.recommendation_rating for topic in topics])
+    return [(topic.recommendation_rating/total_rec_sum) for topic in topics]
 
 
 def retrieve_seed_topics() -> List[BaseTopic]:
     """Retrieve list of seed topics for feeding to LLMs."""
     # TODO: make this smarter
     topics = list(topic_cache.values())
-    seed_topics = sorted(
+    topics = sorted(
         topics, key=lambda topic: topic.recommendation_rating, reverse=True
     )
-    return seed_topics[:MAX_TOPICS]
+    probability_dist = construct_topic_probability_dist(topics)
+    select_size = min(len(topics), MAX_TOPICS)
+    return list(np.random.choice(topics, size=select_size, replace=False, p=probability_dist))
 
 
 def add_user_recommended_topics(user_topics: List[str]) -> None:
     """Seed topic cache with user provided topics."""
+    user_topics = [topic.lower() for topic in user_topics]
     for topic_name in user_topics:
         if topic_name in topic_cache:
             topic = topic_cache[topic_name]

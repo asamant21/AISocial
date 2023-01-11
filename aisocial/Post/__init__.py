@@ -4,14 +4,13 @@ from typing import Dict, List
 
 import openai
 
-from aisocial import chain, clean_parsed_output
+from aisocial import chain
 from aisocial.Post.base import BasePost
-from aisocial.Post.generate import generate_image_prompt
+from aisocial.Post.generate import generate_image_prompt, parse_tweet
 from aisocial.Post.image import ImagePost
 from aisocial.Post.prompts import TWEET_TEMPL
 from aisocial.Post.text import TextPost
 from aisocial.Topic import BaseTopic
-from aisocial.Topic.generate import format_topics_for_prompt
 
 post_cache: Dict[str, BasePost] = {}
 __all__ = ["TextPost", "ImagePost"]
@@ -19,17 +18,21 @@ __all__ = ["TextPost", "ImagePost"]
 
 def generate_text_post(topics: List[BaseTopic]) -> TextPost:
     """Generate a Text Post and add it to the cache."""
-    topic_names = [topic.name for topic in topics]
-    formatted_topics = format_topics_for_prompt(topics)
+    seed_topic_names = [topic.name for topic in topics]
+    formatted_topics = ", ".join(seed_topic_names)
     tweet_question = TWEET_TEMPL.format(topics=formatted_topics)
-    tweet_response = chain(inputs={"question": tweet_question})["text"]
-    tweet_response = clean_parsed_output(tweet_response)
+    llm_output = chain(inputs={"question": tweet_question})["text"]
+    used_topics, tweet = parse_tweet(llm_output)
+
+    diff_topics = set(used_topics) - set(seed_topic_names)
+    if len(diff_topics) > 0:
+        raise ValueError(f"Topics {diff_topics} unexpected")
 
     post_id = str(uuid.uuid4())
     text_post = TextPost(
         post_id=post_id,
-        topics=topic_names,
-        content=tweet_response,
+        topics=used_topics,
+        content=tweet,
         created_time=datetime.now(),
     )
     post_cache[post_id] = text_post

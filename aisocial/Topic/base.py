@@ -11,7 +11,7 @@ class BaseTopic(BaseModel):
     user_provided: bool = False
     num_posts_liked: int = 0
     num_posts_shown: int = 0
-    recommendation_rating: float = 0
+    recommendation_rating: float = 1
     metadata: dict = {}
 
     class Config:

@@ -2,7 +2,11 @@
 import random
 
 from aisocial.Post import BasePost, generate_image_post, generate_text_post
-from aisocial.Topic import retrieve_seed_topics
+from aisocial.Topic import retrieve_seed_topics, generate_new_topics
+
+
+def cull_topics_and_add_new() -> None:
+    """Cull caches of stale topics and posts."""
 
 
 def generate_post() -> BasePost:

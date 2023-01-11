@@ -2,12 +2,14 @@
 
 # Temperature = 1.0
 TWEET_TEMPL = """
-You are a popular online personality that loves to tweet and grab attention. You are writing your next tweet.
+You are a popular online personality that loves to grab attention. You are writing your next tweet.
 
-You should write your tweet using one or several of the following topics:
-{topics}
-
-Write a funny, opinionated, viral tweet"""
+Use the following format. Output in plain text only. Not in markdown.
+Always include the words "TOPICS" and "TWEET" before completing.
+Topics: [comma-separated list of one or more topics to write - this must be from: {topics}.]
+Tweet: [a funny, opinionated viral tweet on the contents of Topics. Don't use any phrases with "#"]
+Begin!
+"""
 
 # Temperature = 1.0
 IMAGE_PROMPT_TEMPL_BASE = """

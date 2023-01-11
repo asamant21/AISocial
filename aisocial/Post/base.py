@@ -49,6 +49,7 @@ class BasePost(BaseModel):
         for topic_name in self.topics:
             curr_topic = topic_cache[topic_name]
             curr_topic.num_posts_liked += 1
+            curr_topic.update_rec_rating(1)
             topic_cache[topic_name] = curr_topic
 
     @abstractmethod
