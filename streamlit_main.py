@@ -101,7 +101,6 @@ def request_user_topics():
 
 
 user_topics = request_user_topics()
-print(st.session_state["post_cache"])
 show_posts(st.session_state["post_list"])
 
 if len(user_topics):
