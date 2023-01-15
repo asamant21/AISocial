@@ -4,7 +4,7 @@ from aisocial.Topic.base import BaseTopic
 from aisocial.Topic.generate import format_topics_for_prompt, generate_topics
 
 topic_cache: Dict[str, BaseTopic] = {}
-MAX_TOPICS = 5
+MAX_TOPICS = 3
 USER_REC_ADJUSTMENT = 2
 
 
@@ -33,7 +33,7 @@ def add_user_recommended_topics(user_topics: List[str]) -> None:
         if topic_name in topic_cache:
             topic = topic_cache[topic_name]
             if topic.user_provided:
-                raise ValueError(f"Already recommended topic {topic_name}")
+                continue
 
             new_topic = topic.copy()
             new_topic.user_provided = True

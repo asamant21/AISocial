@@ -8,6 +8,9 @@ __pycache__/
 # Data folder
 data/
 
+# Binaries
+AISocial.egg-info/
+
 # C extensions
 *.so
 

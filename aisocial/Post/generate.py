@@ -21,7 +21,7 @@ def generate_image_prompt(topics: List[BaseTopic]) -> str:
 def parse_tweet(llm_output: str) -> Tuple[List[str], str]:
     """Parse tweet prompt output to tweet + topics."""
     llm_output = llm_output.strip()
-    regex = r"TOPICS: (.*?)\n*TWEET: (.*)"
+    regex = r":*TOPICS:* (.*?)\n*:*TWEET: (.*)"
     match = re.search(regex, llm_output, re.I)
     if not match:
         raise ValueError(f"Could not parse LLM output: `{llm_output}`")

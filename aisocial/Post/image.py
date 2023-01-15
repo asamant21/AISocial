@@ -3,6 +3,7 @@ import urllib.request
 
 from IPython.display import display
 from PIL import Image
+from typing import Optional, Any
 from pydantic import BaseModel, Extra
 
 from aisocial.Post.base import BasePost, ContentType
