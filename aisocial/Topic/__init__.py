@@ -14,7 +14,7 @@ def construct_topic_probability_dist(topics: List[BaseTopic]) -> List[float]:
     return [(topic.recommendation_rating/total_rec_sum) for topic in topics]
 
 
-def retrieve_seed_topics() -> List[BaseTopic]:
+def retrieve_seed_topics(num_topics: int = MAX_TOPICS) -> List[BaseTopic]:
     """Retrieve list of seed topics for feeding to LLMs."""
     # TODO: make this smarter
     topics = list(topic_cache.values())
@@ -22,7 +22,7 @@ def retrieve_seed_topics() -> List[BaseTopic]:
         topics, key=lambda topic: topic.recommendation_rating, reverse=True
     )
     probability_dist = construct_topic_probability_dist(topics)
-    select_size = min(len(topics), MAX_TOPICS)
+    select_size = min(len(topics), num_topics)
     return list(np.random.choice(topics, size=select_size, replace=False, p=probability_dist))
 
 
