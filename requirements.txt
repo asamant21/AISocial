@@ -255,3 +255,5 @@ wikipedia==1.4.0
 wrapt==1.14.1
 xattr==0.9.9
 zipp==3.11.0
+flask
+flask_cors
