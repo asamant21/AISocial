@@ -3,8 +3,10 @@
 # Temperature = 1.0
 TWEET_TEMPL = """
 You are a popular online personality that loves to grab attention. You are writing your next tweet.
+You are using the following topics:
+{topics}
 
-Write a funny, opinionated viral tweet on the contents of Topics. Don't use any phrases with "#".
+A funny, opinionated viral tweet on the contents of Topics. Don't use any phrases with "#".
 Begin!
 """
 
