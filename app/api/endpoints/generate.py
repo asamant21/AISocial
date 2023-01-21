@@ -41,16 +41,20 @@ def generate_post(user_id: int) -> dict:
     #   'content': 'insert',
     #   'author': 'test2',
     #   'metadata': {}}]
-    insert_resp = supabase.table("Tweet").insert(tweet).execute()
-    return insert_resp.data[0]
+    insert_resp = supabase.table("Tweet").insert(tweet).execute().data[0]
+    return {
+        "id": insert_resp["id"],
+        "author": insert_resp["author"],
+        "content": insert_resp["content"]
+    }
 
 
 def compute_weights(impressions: List[dict]) -> dict:
-    return {1: 0.2}
+    return {i["id"]: i["child_like_count"] for i in impressions}
 
 
 def choose_examples(weights: dict) -> List[str]:
-    return ["example 1", "example 2"]
+    return ["x_user: example 1", "y_user: example 2"]
 
 
 def generate_tweet_from_examples(examples: List[str]) -> dict:
