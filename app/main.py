@@ -1,28 +1,25 @@
-import json
-import os
-from typing import List, Type, Union
+"""Initialize the app."""
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from api.router import api_router
 
-from flask import Flask, abort, request
-from flask_cors import CORS
-from flask import jsonify
-import numpy as np
-from supabase import create_client, Client
+app = FastAPI(
+    title="GPTwitter"
+)
 
+# Set all CORS enabled origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app = Flask(__name__)
-app.debug = True
-CORS(app)
-
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
-
-
-@app.route('/generate-post  ')
-def generate_post():
-    pass
+app.include_router(api_router)
 
 
-@app.route('/like-tweet', methods=["POST"])
-def like_tweet():
-    pass
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
