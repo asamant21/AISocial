@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from app.api import schemas
 from app.config import supabase
-from app.constants import METADATA_PROMPT_TWEET_IDS_KEY
+from app.constants import METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ def generate_post(user_id: int) -> dict:
     #   'created_at': '2023-01-21T22:54:52.770345+00:00',
     #   'content': 'insert',
     #   'author': 'test2',
-    #   'metadata': {}}]
+    #   'metadata': {'prompt_example_tweet_ids': [1, 2, 3]}}]
     insert_resp = supabase.table("Tweet").insert(tweet).execute().data[0]
     return {
         "id": insert_resp["id"],
@@ -46,7 +46,7 @@ def generate_post(user_id: int) -> dict:
 
 
 def compute_weights(impressions: List[dict]) -> dict:
-    return {i["id"]: i["child_like_count"] for i in impressions}
+    return {i["id"]: i[IMPRESSION_TABLE_CHILD_LIKE_COUNT] for i in impressions}
 
 
 def choose_examples(weights: dict) -> dict:
@@ -57,5 +57,5 @@ def generate_tweet_from_examples(examples: dict) -> dict:
     return {
         "content": "foo",
         "author": "foo",
-        "metadata": {METADATA_PROMPT_TWEET_IDS_KEY: [1, 2]}
+        "metadata": {METADATA_PROMPT_TWEET_IDS: [1, 2]}
     }
