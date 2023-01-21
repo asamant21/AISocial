@@ -255,3 +255,4 @@ xattr==0.9.9
 zipp==3.11.0
 flask
 flask_cors
+supabase
