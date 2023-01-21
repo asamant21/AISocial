@@ -17,11 +17,12 @@ url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-@app.route('/generate')
-def generate():
+
+@app.route('/generate-post  ')
+def generate_post():
     pass
 
 
-@app.route('/feedback', methods=["POST"])
-def feedback():
+@app.route('/like-tweet', methods=["POST"])
+def like_tweet():
     pass
