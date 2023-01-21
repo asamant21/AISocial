@@ -1,17 +1,12 @@
 """Endpoints for generating tweets."""
-import os
 from typing import List
 
 from fastapi import APIRouter
-from supabase import create_client, Client
 
 from api import schemas
+from config import supabase
 
 router = APIRouter()
-
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
 
 
 @router.get("", response_model=schemas.Tweet)
@@ -35,7 +30,7 @@ def generate_post(user_id: int) -> dict:
     weights = compute_weights(impressions)
     examples = choose_examples(weights)
     tweet = generate_tweet_from_examples(examples)
-    # Table data schema:
+    # Tweet data schema:
     # [{'id': 6,
     #   'created_at': '2023-01-21T22:54:52.770345+00:00',
     #   'content': 'insert',
