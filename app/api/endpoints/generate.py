@@ -3,8 +3,8 @@ from typing import List
 
 from fastapi import APIRouter
 
-from api import schemas
-from config import supabase
+from app.api import schemas
+from app.config import supabase
 
 router = APIRouter()
 
