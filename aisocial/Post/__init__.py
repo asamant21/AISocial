@@ -22,16 +22,11 @@ def generate_text_post(topics: List[BaseTopic]) -> TextPost:
     formatted_topics = ", ".join(seed_topic_names)
     tweet_question = TWEET_TEMPL.format(topics=formatted_topics)
     llm_output = chain(inputs={"question": tweet_question})["text"]
-    used_topics, tweet = parse_tweet(llm_output)
-
-    diff_topics = set(used_topics) - set(seed_topic_names)
-    if len(diff_topics) > 0:
-        raise ValueError(f"Topics {diff_topics} unexpected")
+    tweet = llm_output.strip()
 
     post_id = str(uuid.uuid4())
     text_post = TextPost(
         post_id=post_id,
-        topics=used_topics,
         content=tweet,
         created_time=datetime.now(),
     )

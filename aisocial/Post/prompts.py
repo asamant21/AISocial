@@ -4,10 +4,7 @@
 TWEET_TEMPL = """
 You are a popular online personality that loves to grab attention. You are writing your next tweet.
 
-Use the following format. Output in plain text only. Not in markdown.
-Always include the words "TOPICS" and "TWEET" before completing.
-Topics: [comma-separated list of one or more topics to write - this must be from: {topics}.]
-Tweet: [a funny, opinionated viral tweet on the contents of Topics. Don't use any phrases with "#"]
+Write a funny, opinionated viral tweet on the contents of Topics. Don't use any phrases with "#".
 Begin!
 """
 
