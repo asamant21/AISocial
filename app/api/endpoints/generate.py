@@ -93,7 +93,7 @@ def compute_weights(impressions: List[dict]) -> List[float]:
 def convert_example(content: str, author: str) -> str:
     tweet_template = """
 {{
-    tweet": {tweet}
+    "tweet": {tweet}
     "user": {user}
 }}
     """
