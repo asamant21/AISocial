@@ -13,7 +13,8 @@ from app.config import supabase
 from app.constants import (
     TWEET_TABLE_ID,
     TWEET_TABLE_AUTHOR, TWEET_TABLE_CONTENT, TWEET_TABLE_NAME,
-    IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, IMPRESSION_TABLE_LIKED
+    IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, IMPRESSION_TABLE_LIKED,
+    TWEET_TABLE_METADATA, TWEET_METADATA_PROMPT_TWEET_IDS
 )
 from app.api.endpoints.prompts import eg_prompt, prefix, suffix, day_quote
 
@@ -32,8 +33,8 @@ def generate_post(user_id: str) -> dict:
     if len(impressions) == 0:
         seed_impressions(user_id)
     weights = compute_weights(impressions)
-    examples = choose_examples(weights, impressions)
-    tweet = generate_tweet_from_examples(examples)
+    chosen_impressions = choose_impressions(weights, impressions)
+    tweet = generate_tweet_from_impressions(chosen_impressions)
     insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
     return {
         TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
@@ -65,10 +66,9 @@ def convert_example(content: str, author: str) -> str:
     return tweet_template.format(tweet=content, user=author)
 
 
-def choose_examples(weights: List[float], impressions: List[dict]) -> List[str]:
+def convert_impressions_to_examples(impressions: List[dict]) -> List[str]:
     examples = []
-    chosen_impressions = np.random.choice(impressions, size=5, p=weights)
-    for impression in chosen_impressions:
+    for impression in impressions:
         tweet = get_tweet(impression[IMPRESSION_TABLE_TWEET_ID])
         content = tweet[TWEET_TABLE_CONTENT]
         author = tweet[TWEET_TABLE_AUTHOR]
@@ -76,21 +76,28 @@ def choose_examples(weights: List[float], impressions: List[dict]) -> List[str]:
     return examples
 
 
-def generate_tweet_from_examples(examples: List[str]) -> dict:
-    eg = eg_prompt.format(tweets=("\n".join(examples)))
-    day_prefix = day_quote.format(today=str(datetime.today().date()))
-    full_prefix = prefix + f"\n{day_prefix}"
-    full_prompt = full_prefix + eg + suffix
-    llm = OpenAI(temperature=1)
+def choose_impressions(weights: List[float], impressions: List[dict]) -> List[dict]:
+    chosen_impressions = np.random.choice(impressions, size=3, replace=False, p=weights)
+    return chosen_impressions
 
+
+def generate_tweet_from_impressions(impressions: List[dict]) -> dict:
+    examples = convert_impressions_to_examples(impressions)
+    eg = eg_prompt.format(tweets="\n".join(examples))
+    day_suffix = day_quote.format(today=str(datetime.today().date()))
+    full_suffix = day_suffix + suffix
+    full_prompt = prefix + eg + full_suffix
+    print(full_prompt)
+    curr_temp = 0.85
+
+    llm = OpenAI(temperature=curr_temp)
     loaded_dict = {}
 
-    curr_temp = 1
     for i in range(3):
         try:
             llm.temperature = curr_temp
             gen_tweet = llm(full_prompt)
-            stripped_tweet = gen_tweet.strip("\n ")
+            stripped_tweet = gen_tweet.strip(",\n")
             loaded_dict = json.loads(stripped_tweet)
             break
         except:
@@ -101,8 +108,14 @@ def generate_tweet_from_examples(examples: List[str]) -> dict:
     if len(loaded_dict) == 0:
         return loaded_dict
 
+    impression_ids = [impression[IMPRESSION_TABLE_TWEET_ID] for impression in impressions]
+
     return_dict = {
         TWEET_TABLE_CONTENT: loaded_dict["tweet"],
-        TWEET_TABLE_AUTHOR: loaded_dict["user"]
+        TWEET_TABLE_AUTHOR: loaded_dict["user"],
+        TWEET_TABLE_METADATA: {
+            TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids
+        }
     }
+    print(return_dict)
     return return_dict
