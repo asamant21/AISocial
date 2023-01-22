@@ -1,7 +1,8 @@
-"""Endpoints for generating tweets."""
+"""Endpoints for liking tweets."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.api import deps
 from app.config import supabase
 from app.constants import TWEET_METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
     IMPRESSION_TABLE_ID, IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, \
@@ -12,16 +13,15 @@ router = APIRouter()
 
 
 @router.get("/{tweet_id}")
-def like(tweet_id: int):
+def like(tweet_id: int, current_user: str = Depends(deps.get_current_user)):
     """Like a tweet by id."""
-    user_id = 1
-    add_direct_impression(tweet_id, user_id)
+    add_direct_impression(tweet_id, current_user)
     tweet = get_tweet(tweet_id)
     prompt_examples = tweet[TWEET_TABLE_METADATA][TWEET_METADATA_PROMPT_TWEET_IDS]
     for prompt_tweet_id in prompt_examples:
-        existing_impression = get_impression(tweet_id, user_id)
+        existing_impression = get_impression(prompt_tweet_id, current_user)
         if len(existing_impression) == 0:
-            add_prompt_impression(prompt_tweet_id, user_id)
+            add_prompt_impression(prompt_tweet_id, current_user)
         elif len(existing_impression) == 1:
             update_prompt_impression(existing_impression[0])
         else:
@@ -31,8 +31,8 @@ def like(tweet_id: int):
             )
 
 
-def add_direct_impression(tweet_id: int, user_id: int) -> None:
-    """"""
+def add_direct_impression(tweet_id: int, user_id: str) -> None:
+    """Add an impression of a direct tweet like."""
     direct_impression = {
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
         IMPRESSION_TABLE_USER_ID: user_id,
@@ -56,8 +56,8 @@ def get_tweet(tweet_id: int) -> dict:
     return tweet
 
 
-def get_impression(tweet_id: int, user_id: int) -> dict:
-    """"""
+def get_impression(tweet_id: int, user_id: str) -> dict:
+    """Retrieve impression based on tweet and user id."""
     impression = (
         supabase.table(IMPRESSION_TABLE_NAME)
             .select("*")
@@ -69,7 +69,8 @@ def get_impression(tweet_id: int, user_id: int) -> dict:
     return impression
 
 
-def add_prompt_impression(tweet_id: int, user_id: int) -> None:
+def add_prompt_impression(tweet_id: int, user_id: str) -> None:
+    """Add impression for a prompt tweet after a derived tweet was liked."""
     impression = {
         IMPRESSION_TABLE_USER_ID: user_id,
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
@@ -81,6 +82,7 @@ def add_prompt_impression(tweet_id: int, user_id: int) -> None:
 
 
 def update_prompt_impression(impression: dict) -> None:
+    """Update existing impression for a prompt tweet after a derived tweet was liked."""
     count = impression[IMPRESSION_TABLE_CHILD_LIKE_COUNT]
     impression_id = impression[IMPRESSION_TABLE_ID]
     update_resp = (
