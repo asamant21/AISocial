@@ -1,5 +1,4 @@
 from langchain.prompts import FewShotPromptTemplate, PromptTemplate
-from datetime import datetime
 
 prefix = """
 You are provided a list of tweets that a particular Twitter user has liked in the past.

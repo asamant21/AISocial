@@ -1,5 +1,4 @@
 """Endpoints for generating tweets."""
-import os
 from typing import List
 import numpy as np
 from datetime import datetime
@@ -7,23 +6,23 @@ import json
 from endpoints.prompts import eg_prompt, prefix, suffix, day_quote
 
 from fastapi import APIRouter
-from supabase import create_client, Client
 from langchain.llms import OpenAI
 
 
-from api import schemas
+from app.api import schemas
+from app.config import supabase
+from app.constants import TWEET_METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
+    IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, TWEET_TABLE_ID, \
+    TWEET_TABLE_METADATA, TWEET_TABLE_AUTHOR, TWEET_TABLE_CONTENT, TWEET_TABLE_NAME
 
 router = APIRouter()
 
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
 
 @router.get("", response_model=schemas.Tweet)
 def generate():
     """Generate a tweet for the user."""
 
-    return {"id": 1, "content": "foo", "author": "foo"}
+    return {TWEET_TABLE_ID: 1, TWEET_TABLE_CONTENT: "foo", TWEET_TABLE_AUTHOR: "foo"}
 
 
 def generate_post(user_id: int) -> dict:
@@ -35,19 +34,27 @@ def generate_post(user_id: int) -> dict:
     #   'child_like_count': 1,
     #   'liked': True}]
     impressions = (
-        supabase.table("Impression").select("*").filter("user_id", "eq", user_id).execute().data
+        supabase.table(IMPRESSION_TABLE_NAME)
+            .select("*")
+            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+            .execute()
+            .data
     )
     weights = compute_weights(impressions)
     examples = choose_examples(weights)
     tweet = generate_tweet_from_examples(examples)
-    # Table data schema:
+    # Tweet data schema:
     # [{'id': 6,
     #   'created_at': '2023-01-21T22:54:52.770345+00:00',
     #   'content': 'insert',
     #   'author': 'test2',
-    #   'metadata': {}}]
-    insert_resp = supabase.table("Tweet").insert(tweet).execute()
-    return insert_resp.data[0]
+    #   'metadata': {'prompt_example_tweet_ids': [1, 2, 3]}}]
+    insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
+    return {
+        TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
+        TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
+        TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
+    }
 
 
 def compute_weights(impressions: List[dict]) -> dict:
@@ -67,8 +74,11 @@ def compute_weights(impressions: List[dict]) -> dict:
 
 
 def convert_examples(examples: List[str]) -> List[str]:
-    tweet_template = """"tweet": {tweet}
+    tweet_template = """
+{{
+    tweet": {tweet}
     "user": {user}
+}}
     """
     tweet_arr = []
     for example in examples:
