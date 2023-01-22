@@ -87,7 +87,6 @@ def generate_tweet_from_impressions(impressions: List[dict]) -> dict:
     day_suffix = day_quote.format(today=str(datetime.today().date()))
     full_suffix = day_suffix + suffix
     full_prompt = prefix + eg + full_suffix
-    print(full_prompt)
     curr_temp = 0.85
 
     llm = OpenAI(temperature=curr_temp)
