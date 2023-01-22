@@ -22,7 +22,7 @@ router = APIRouter()
 @router.get("", response_model=schemas.Tweet)
 def generate(current_user: str = Depends(deps.get_current_user)):
     """Generate a tweet for the user."""
-
+    print(current_user)
     return {TWEET_TABLE_ID: 1, TWEET_TABLE_CONTENT: "foo", TWEET_TABLE_AUTHOR: "foo"}
 
 

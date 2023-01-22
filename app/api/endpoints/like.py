@@ -14,6 +14,7 @@ router = APIRouter()
 @router.get("/{tweet_id}")
 def like(tweet_id: int, current_user: str = Depends(deps.get_current_user)):
     """Like a tweet by id."""
+    print(current_user)
     user_id = 1
     add_direct_impression(tweet_id, user_id)
     tweet = get_tweet(tweet_id)
