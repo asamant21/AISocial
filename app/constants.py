@@ -1,0 +1,18 @@
+"""App constants."""
+
+IMPRESSION_TABLE_NAME = "Impression"
+IMPRESSION_TABLE_ID = "id"
+IMPRESSION_TABLE_USER_ID = "user_id"
+IMPRESSION_TABLE_TWEET_ID = "tweet_id"
+IMPRESSION_TABLE_LIKED = "liked"
+IMPRESSION_TABLE_CHILD_LIKE_COUNT = "child_like_count"
+
+TWEET_TABLE_NAME = "Tweet"
+TWEET_TABLE_ID = "id"
+TWEET_TABLE_AUTHOR = "author"
+TWEET_TABLE_CONTENT = "content"
+TWEET_TABLE_METADATA = "metadata"
+TWEET_METADATA_PROMPT_TWEET_IDS = "prompt_example_tweet_ids"
+
+SUPABASE_TRUE_VAL = "true"
+SUPABASE_FALSE_VAL = "false"
