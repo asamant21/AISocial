@@ -5,7 +5,9 @@ from fastapi import APIRouter
 
 from app.api import schemas
 from app.config import supabase
-from app.constants import METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT
+from app.constants import METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
+    IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, TWEET_TABLE_ID, \
+    TWEET_TABLE_METADATA, TWEET_TABLE_AUTHOR, TWEET_TABLE_CONTENT, TWEET_TABLE_NAME
 
 router = APIRouter()
 
@@ -14,7 +16,7 @@ router = APIRouter()
 def generate():
     """Generate a tweet for the user."""
 
-    return {"id": 1, "content": "foo", "author": "foo"}
+    return {TWEET_TABLE_ID: 1, TWEET_TABLE_CONTENT: "foo", TWEET_TABLE_AUTHOR: "foo"}
 
 
 def generate_post(user_id: int) -> dict:
@@ -26,7 +28,7 @@ def generate_post(user_id: int) -> dict:
     #   'child_like_count': 1,
     #   'liked': True}]
     impressions = (
-        supabase.table("Impression").select("*").filter("user_id", "eq", user_id).execute().data
+        supabase.table(IMPRESSION_TABLE_NAME).select("*").filter(IMPRESSION_TABLE_USER_ID, "eq", user_id).execute().data
     )
     weights = compute_weights(impressions)
     examples = choose_examples(weights)
@@ -37,16 +39,16 @@ def generate_post(user_id: int) -> dict:
     #   'content': 'insert',
     #   'author': 'test2',
     #   'metadata': {'prompt_example_tweet_ids': [1, 2, 3]}}]
-    insert_resp = supabase.table("Tweet").insert(tweet).execute().data[0]
+    insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
     return {
-        "id": insert_resp["id"],
-        "author": insert_resp["author"],
-        "content": insert_resp["content"]
+        TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
+        TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
+        TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
     }
 
 
 def compute_weights(impressions: List[dict]) -> dict:
-    return {i["id"]: i[IMPRESSION_TABLE_CHILD_LIKE_COUNT] for i in impressions}
+    return {i[TWEET_TABLE_ID]: i[IMPRESSION_TABLE_CHILD_LIKE_COUNT] for i in impressions}
 
 
 def choose_examples(weights: dict) -> dict:
@@ -55,7 +57,7 @@ def choose_examples(weights: dict) -> dict:
 
 def generate_tweet_from_examples(examples: dict) -> dict:
     return {
-        "content": "foo",
-        "author": "foo",
-        "metadata": {METADATA_PROMPT_TWEET_IDS: [1, 2]}
+        TWEET_TABLE_CONTENT: "foo",
+        TWEET_TABLE_AUTHOR: "foo",
+        TWEET_TABLE_METADATA: {METADATA_PROMPT_TWEET_IDS: [1, 2]}
     }

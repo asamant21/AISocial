@@ -9,6 +9,8 @@ IMPRESSION_TABLE_CHILD_LIKE_COUNT = "child_like_count"
 
 TWEET_TABLE_NAME = "Tweet"
 TWEET_TABLE_ID = "id"
+TWEET_TABLE_AUTHOR = "author"
+TWEET_TABLE_CONTENT = "content"
 TWEET_TABLE_METADATA = "metadata"
 METADATA_PROMPT_TWEET_IDS = "prompt_example_tweet_ids"
 
