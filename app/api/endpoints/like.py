@@ -14,12 +14,12 @@ router = APIRouter()
 @router.get("/{tweet_id}")
 def like(tweet_id: int):
     """Like a tweet by id."""
-    user_id = 1
+    user_id = "1c0966aa-2e95-441a-94e9-c7bce48efd29"
     add_direct_impression(tweet_id, user_id)
     tweet = get_tweet(tweet_id)
     prompt_examples = tweet[TWEET_TABLE_METADATA][TWEET_METADATA_PROMPT_TWEET_IDS]
     for prompt_tweet_id in prompt_examples:
-        existing_impression = get_impression(tweet_id, user_id)
+        existing_impression = get_impression(prompt_tweet_id, user_id)
         if len(existing_impression) == 0:
             add_prompt_impression(prompt_tweet_id, user_id)
         elif len(existing_impression) == 1:
@@ -31,7 +31,7 @@ def like(tweet_id: int):
             )
 
 
-def add_direct_impression(tweet_id: int, user_id: int) -> None:
+def add_direct_impression(tweet_id: int, user_id: str) -> None:
     """"""
     direct_impression = {
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
@@ -56,7 +56,7 @@ def get_tweet(tweet_id: int) -> dict:
     return tweet
 
 
-def get_impression(tweet_id: int, user_id: int) -> dict:
+def get_impression(tweet_id: int, user_id: str) -> dict:
     """"""
     impression = (
         supabase.table(IMPRESSION_TABLE_NAME)
@@ -69,7 +69,7 @@ def get_impression(tweet_id: int, user_id: int) -> dict:
     return impression
 
 
-def add_prompt_impression(tweet_id: int, user_id: int) -> None:
+def add_prompt_impression(tweet_id: int, user_id: str) -> None:
     impression = {
         IMPRESSION_TABLE_USER_ID: user_id,
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
