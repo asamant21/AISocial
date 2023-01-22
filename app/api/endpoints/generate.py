@@ -1,11 +1,11 @@
 """Endpoints for generating tweets."""
-from typing import List, Dict
+from typing import List
 
 from fastapi import APIRouter
 
 from app.api import schemas
 from app.config import supabase
-from app.constants import METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
+from app.constants import TWEET_METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
     IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, TWEET_TABLE_ID, \
     TWEET_TABLE_METADATA, TWEET_TABLE_AUTHOR, TWEET_TABLE_CONTENT, TWEET_TABLE_NAME
 
@@ -28,7 +28,11 @@ def generate_post(user_id: int) -> dict:
     #   'child_like_count': 1,
     #   'liked': True}]
     impressions = (
-        supabase.table(IMPRESSION_TABLE_NAME).select("*").filter(IMPRESSION_TABLE_USER_ID, "eq", user_id).execute().data
+        supabase.table(IMPRESSION_TABLE_NAME)
+            .select("*")
+            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+            .execute()
+            .data
     )
     weights = compute_weights(impressions)
     examples = choose_examples(weights)
@@ -59,5 +63,5 @@ def generate_tweet_from_examples(examples: dict) -> dict:
     return {
         TWEET_TABLE_CONTENT: "foo",
         TWEET_TABLE_AUTHOR: "foo",
-        TWEET_TABLE_METADATA: {METADATA_PROMPT_TWEET_IDS: [1, 2]}
+        TWEET_TABLE_METADATA: {TWEET_METADATA_PROMPT_TWEET_IDS: [1, 2]}
     }

@@ -3,7 +3,7 @@
 from fastapi import APIRouter
 
 from app.config import supabase
-from app.constants import METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
+from app.constants import TWEET_METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
     IMPRESSION_TABLE_ID, IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, \
     IMPRESSION_TABLE_TWEET_ID, TWEET_TABLE_METADATA, IMPRESSION_TABLE_LIKED, \
     TWEET_TABLE_NAME, SUPABASE_TRUE_VAL, TWEET_TABLE_ID
@@ -15,14 +15,22 @@ router = APIRouter()
 def like(tweet_id: int):
     """Like a tweet by id."""
     user_id = 1
-    direct_impression = {IMPRESSION_TABLE_TWEET_ID: tweet_id, IMPRESSION_TABLE_USER_ID: user_id, IMPRESSION_TABLE_LIKED: SUPABASE_TRUE_VAL}
+    direct_impression = {
+        IMPRESSION_TABLE_TWEET_ID: tweet_id,
+        IMPRESSION_TABLE_USER_ID: user_id,
+        IMPRESSION_TABLE_LIKED: SUPABASE_TRUE_VAL
+    }
     insert_resp = supabase.table(IMPRESSION_TABLE_NAME).insert(direct_impression).execute()
     assert len(insert_resp.data) > 0
 
     tweet = (
-        supabase.table(TWEET_TABLE_NAME).select("*").filter(TWEET_TABLE_ID, "eq", tweet_id).execute().data[0]
+        supabase.table(TWEET_TABLE_NAME)
+            .select("*")
+            .filter(TWEET_TABLE_ID, "eq", tweet_id)
+            .execute()
+            .data[0]
     )
-    prompt_examples = tweet[TWEET_TABLE_METADATA][METADATA_PROMPT_TWEET_IDS]
+    prompt_examples = tweet[TWEET_TABLE_METADATA][TWEET_METADATA_PROMPT_TWEET_IDS]
     for prompt_tweet_id in prompt_examples:
         existing_impression = (
             supabase.table(IMPRESSION_TABLE_NAME)
@@ -53,7 +61,8 @@ def like(tweet_id: int):
             assert len(update_resp) > 0
         else:
             raise ValueError(
-                "Duplicate user <> tweet impression stored in Impression table."
+                f"Duplicate user <> tweet impression stored in {IMPRESSION_TABLE_NAME}"
+                f" table."
             )
         assert len(insert_resp.data) > 0
 

@@ -12,7 +12,7 @@ TWEET_TABLE_ID = "id"
 TWEET_TABLE_AUTHOR = "author"
 TWEET_TABLE_CONTENT = "content"
 TWEET_TABLE_METADATA = "metadata"
-METADATA_PROMPT_TWEET_IDS = "prompt_example_tweet_ids"
+TWEET_METADATA_PROMPT_TWEET_IDS = "prompt_example_tweet_ids"
 
 SUPABASE_TRUE_VAL = "true"
 SUPABASE_FALSE_VAL = "false"
