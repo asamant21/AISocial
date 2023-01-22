@@ -4,3 +4,4 @@ pydantic
 supabase
 langchain
 numpy
+openai
