@@ -3,10 +3,11 @@ from typing import List
 import numpy as np
 from datetime import datetime
 import json
-from endpoints.prompts import eg_prompt, prefix, suffix, day_quote
+from app.api.endpoints.prompts import eg_prompt, prefix, suffix, day_quote
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from langchain.llms import OpenAI
+from app.api import deps
 
 
 from app.api import schemas
@@ -19,7 +20,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=schemas.Tweet)
-def generate():
+def generate(current_user: str = Depends(deps.get_current_user)):
     """Generate a tweet for the user."""
 
     return {TWEET_TABLE_ID: 1, TWEET_TABLE_CONTENT: "foo", TWEET_TABLE_AUTHOR: "foo"}

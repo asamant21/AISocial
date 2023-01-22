@@ -1,18 +1,18 @@
 """Endpoints for generating tweets."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from app.config import supabase
 from app.constants import TWEET_METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
     IMPRESSION_TABLE_ID, IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, \
     IMPRESSION_TABLE_TWEET_ID, TWEET_TABLE_METADATA, IMPRESSION_TABLE_LIKED, \
     TWEET_TABLE_NAME, SUPABASE_TRUE_VAL, TWEET_TABLE_ID
-
+from app.api import deps
 router = APIRouter()
 
 
 @router.get("/{tweet_id}")
-def like(tweet_id: int):
+def like(tweet_id: int, current_user: str = Depends(deps.get_current_user)):
     """Like a tweet by id."""
     user_id = 1
     add_direct_impression(tweet_id, user_id)
