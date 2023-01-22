@@ -76,7 +76,7 @@ def compute_weights(impressions: List[dict]) -> dict:
 def convert_examples(examples: List[str]) -> List[str]:
     tweet_template = """
 {{
-    tweet": {tweet}
+    "tweet": {tweet}
     "user": {user}
 }}
     """
