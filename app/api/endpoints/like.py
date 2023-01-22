@@ -15,14 +15,13 @@ router = APIRouter()
 @router.get("/{tweet_id}")
 def like(tweet_id: int, current_user: str = Depends(deps.get_current_user)):
     """Like a tweet by id."""
-    user_id = "1c0966aa-2e95-441a-94e9-c7bce48efd29"
-    add_direct_impression(tweet_id, user_id)
+    add_direct_impression(tweet_id, current_user)
     tweet = get_tweet(tweet_id)
     prompt_examples = tweet[TWEET_TABLE_METADATA][TWEET_METADATA_PROMPT_TWEET_IDS]
     for prompt_tweet_id in prompt_examples:
-        existing_impression = get_impression(prompt_tweet_id, user_id)
+        existing_impression = get_impression(prompt_tweet_id, current_user)
         if len(existing_impression) == 0:
-            add_prompt_impression(prompt_tweet_id, user_id)
+            add_prompt_impression(prompt_tweet_id, current_user)
         elif len(existing_impression) == 1:
             update_prompt_impression(existing_impression[0])
         else:
