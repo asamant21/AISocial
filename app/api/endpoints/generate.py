@@ -8,12 +8,12 @@ from fastapi import APIRouter, Depends
 from langchain.llms import OpenAI
 
 from app.api import deps, schemas
+from app.api.db import get_user_impressions, seed_impressions, get_tweet
 from app.config import supabase
 from app.constants import (
-    IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, TWEET_TABLE_ID,
+    TWEET_TABLE_ID,
     TWEET_TABLE_AUTHOR, TWEET_TABLE_CONTENT, TWEET_TABLE_NAME,
-    IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, SEED_TWEET_IDS,
-    IMPRESSION_TABLE_LIKED
+    IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, IMPRESSION_TABLE_LIKED
 )
 from app.api.endpoints.prompts import eg_prompt, prefix, suffix, day_quote
 
@@ -28,7 +28,7 @@ def generate(current_user: str = Depends(deps.get_current_user)):
 
 
 def generate_post(user_id: str) -> dict:
-    impressions = get_impressions(user_id)
+    impressions = get_user_impressions(user_id)
     if len(impressions) == 0:
         seed_impressions(user_id)
     weights = compute_weights(impressions)
@@ -40,41 +40,6 @@ def generate_post(user_id: str) -> dict:
         TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
         TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
     }
-
-
-def get_impressions(user_id: str) -> List[dict]:
-    """Return all the impressions for a user."""
-    impressions = (
-        supabase.table(IMPRESSION_TABLE_NAME)
-            .select("*")
-            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-            .execute()
-            .data
-    )
-    return impressions
-
-
-def seed_impressions(user_id: str) -> List[dict]:
-    for tweet_id in SEED_TWEET_IDS:
-        impression = {
-            IMPRESSION_TABLE_USER_ID: user_id,
-            IMPRESSION_TABLE_TWEET_ID: tweet_id,
-            IMPRESSION_TABLE_CHILD_LIKE_COUNT: 1,
-        }
-        insert_resp = supabase.table(IMPRESSION_TABLE_NAME).insert(impression).execute().data
-        assert len(insert_resp) > 0
-
-
-def get_tweet(tweet_id: int) -> dict:
-    """Retrieve tweet based on id."""
-    tweet = (
-        supabase.table(TWEET_TABLE_NAME)
-            .select("*")
-            .filter(TWEET_TABLE_ID, "eq", tweet_id)
-            .execute()
-            .data[0]
-    )
-    return tweet
 
 
 def compute_weights(impressions: List[dict]) -> List[float]:
