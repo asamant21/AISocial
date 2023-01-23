@@ -1,6 +1,7 @@
 """Endpoints for generating tweets."""
 from typing import List
 import numpy as np
+import random
 from datetime import datetime
 import json
 
@@ -34,6 +35,10 @@ def generate_post(user_id: str) -> dict:
         seed_impressions(user_id)
         impressions = get_user_impressions(user_id)
 
+    generate_post_val = random.uniform(0, 1)
+    if len(impressions) < 30 and generate_post_val < 0.5:
+        return get_random_existing_tweet()
+
     weights = compute_weights(impressions)
     chosen_impressions = choose_impressions(weights, impressions)
     tweet = generate_tweet_from_impressions(chosen_impressions)
@@ -43,6 +48,11 @@ def generate_post(user_id: str) -> dict:
         TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
         TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
     }
+
+
+def get_random_existing_tweet() -> dict:
+
+    return
 
 
 def compute_weights(impressions: List[dict]) -> List[float]:
