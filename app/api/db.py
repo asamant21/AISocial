@@ -57,7 +57,7 @@ def get_user_impressions(user_id: str, rerun_whole: bool = False) -> List[dict]:
 
 def seed_impressions(user_id: str) -> None:
     """Add initial impressions for a new user."""
-    tweets_to_use = random.sample(SEED_TWEET_IDS, k=15)
+    tweets_to_use = random.sample(SEED_TWEET_IDS, k=20)
     for tweet_id in tweets_to_use:
         impression = {
             IMPRESSION_TABLE_USER_ID: user_id,
