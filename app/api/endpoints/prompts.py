@@ -80,7 +80,7 @@ Guidelines for Creating Your Own Tweet:
 - Be controversial
 - Do not use optimism as your main tone
 - Avoid using overly positive language or emojis
-- Avoid the use of hashtags
+- Do not use hashtags at all
 - Try many different puns, idioms, jokes, and pop culture references
 - Irony and absurdity is strongly encouraged
 """
