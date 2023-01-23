@@ -1,6 +1,6 @@
 """Helper functions for interacting with the database."""
 from typing import List
-
+from datetime import datetime, timezone
 import requests
 
 from app.config import key, supabase, url
@@ -10,6 +10,7 @@ from app.constants import (
     IMPRESSION_TABLE_LIKED,
     IMPRESSION_TABLE_NAME,
     IMPRESSION_TABLE_TWEET_ID,
+    IMPRESSION_TABLE_CREATED_TIME,
     IMPRESSION_TABLE_USER_ID,
     SEED_TWEET_IDS,
     SUPABASE_TRUE_VAL,
@@ -18,15 +19,38 @@ from app.constants import (
 )
 
 
-def get_user_impressions(user_id: str) -> List[dict]:
-    """Return all the impressions for a user."""
+def get_seed_impressions(user_id: str) -> List[dict]:
+    """Return all seed impressions."""
     impressions = (
-        supabase.table(IMPRESSION_TABLE_NAME)
-        .select("*")
-        .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-        .execute()
-        .data
+        supabase.table("Impression")
+            .select("*")
+            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+            .filter(IMPRESSION_TABLE_TWEET_ID, "in", tuple(SEED_TWEET_IDS))
+            .execute()
+            .data
     )
+    return impressions
+
+
+def get_user_impressions(user_id: str, rerun_whole: bool = False) -> List[dict]:
+    """Return all the impressions for a user."""
+    if rerun_whole:
+        impressions = (
+            supabase.table("Impression")
+                .select("*")
+                .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+                .filter(IMPRESSION_TABLE_CREATED_TIME, "gt", datetime.now(timezone.utc))
+                .execute()
+                .data
+        )
+    else:
+        impressions = (
+            supabase.table(IMPRESSION_TABLE_NAME)
+            .select("*")
+            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+            .execute()
+            .data
+        )
     return impressions
 
 
