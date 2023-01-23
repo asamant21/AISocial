@@ -16,6 +16,8 @@ from app.api.db import (
     get_user_impressions,
     seed_impressions,
 )
+from app.api.endpoints.prompts import liked_prefix, eg_prompt, day_quote, user_spec, \
+    liked_suffix
 from app.config import supabase
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
