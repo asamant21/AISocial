@@ -15,6 +15,7 @@ from app.api.db import (
     get_tweet_likes,
     get_user_impressions,
     seed_impressions,
+    get_seed_impressions,
 )
 from app.api.endpoints.prompts import (
     day_quote,
@@ -39,17 +40,24 @@ from app.constants import (
 router = APIRouter()
 
 
-@router.get("", response_model=schemas.Tweet)
-def generate(current_user: str = Depends(deps.get_current_user)):
+@router.get("/{rerun_whole}", response_model=schemas.Tweet)
+def generate(rerun_whole: bool = False, current_user: str = Depends(deps.get_current_user)):
     """Generate a tweet for the user."""
     print(current_user)
-    return generate_post(current_user)
+    return generate_post(current_user, rerun_whole)
 
 
-def generate_post(user_id: str) -> dict:
-    impressions = get_user_impressions(user_id)
+def generate_post(user_id: str, rerun_whole: bool = False) -> dict:
+    impressions = get_user_impressions(user_id, rerun_whole)
     if len(impressions) == 0:
-        seed_impressions(user_id)
+        # Rerunning whole returned nothing
+        if not rerun_whole:
+            impressions = get_seed_impressions(user_id)
+
+        # If length is still 0, then seed and get seed impressions
+        if len(impressions) == 0:
+            seed_impressions(user_id)
+            impressions = get_seed_impressions(user_id)
 
     random_val = random.uniform(0, 1)
     use_pregenerated = len(impressions) < 30 and random_val < 0.5
@@ -63,7 +71,6 @@ def generate_post(user_id: str) -> dict:
             "likes": likes,
         }
     else:
-        impressions = get_user_impressions(user_id)
         weights = compute_weights(impressions)
         chosen_impressions = choose_impressions(weights, impressions)
         tweet = generate_tweet_from_impressions(chosen_impressions)
