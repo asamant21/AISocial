@@ -1,4 +1,4 @@
-""""""
+"""Helper functions for interacting with the database."""
 from typing import List
 
 import requests
@@ -31,6 +31,7 @@ def get_user_impressions(user_id: str) -> List[dict]:
 
 
 def seed_impressions(user_id: str) -> None:
+    """Add initial impressions for a new user."""
     for tweet_id in SEED_TWEET_IDS:
         impression = {
             IMPRESSION_TABLE_USER_ID: user_id,
@@ -56,6 +57,7 @@ def get_tweet(tweet_id: int) -> dict:
 
 
 def get_pregenerated_tweet() -> dict:
+    """"""
     token = f"Bearer {key}"
     request_url = f"{url}/rest/v1/rpc/get_random_tweet"
     res = requests.request(
