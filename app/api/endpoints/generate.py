@@ -40,12 +40,11 @@ from app.constants import (
 router = APIRouter()
 
 
-@router.get("/{rerun}", response_model=schemas.Tweet)
-def generate(rerun: str = "continue", current_user: str = Depends(deps.get_current_user)):
+@router.get("", response_model=schemas.Tweet)
+def generate(current_user: str = Depends(deps.get_current_user)):
     """Generate a tweet for the user."""
     print(current_user)
-    rerun_whole = rerun == "rerun"
-    return generate_post(current_user, rerun_whole)
+    return generate_post(current_user)
 
 
 def generate_post(user_id: str, rerun_whole: bool = False) -> dict:
