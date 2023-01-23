@@ -45,7 +45,9 @@ The tweets are provided in the following JSON Format:
 }}.
 """
 
-liked_suffix = tweet_json_format + """
+liked_suffix = (
+    tweet_json_format
+    + """
 Guidelines for Creating Your Own Tweet:
 - Use a style and tone imitating those in the tweets above.
 - Write with a personality imitating the tweets above.
@@ -58,6 +60,7 @@ Guidelines for Creating Your Own Tweet:
 - Avoid mentioning specific dates or time-sensitive information in the tweet
 - Avoid using hashtags that are specific to a certain event or trend
 """
+)
 eg_template = """
 List of liked tweets:
 {tweets}

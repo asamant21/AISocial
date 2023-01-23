@@ -1,9 +1,9 @@
 """Base Class for an Image Post."""
 import urllib.request
+from typing import Any, Optional
 
 from IPython.display import display
 from PIL import Image
-from typing import Optional, Any
 from pydantic import BaseModel, Extra
 
 from aisocial.Post.base import BasePost, ContentType

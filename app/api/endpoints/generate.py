@@ -1,24 +1,40 @@
 """Endpoints for generating tweets."""
-from typing import List
-import numpy as np
+import json
 import random
 from datetime import datetime
-import json
+from typing import List
 
+import numpy as np
 from fastapi import APIRouter, Depends
 from langchain.llms import OpenAI
 
 from app.api import deps, schemas
-from app.api.db import get_user_impressions, seed_impressions, get_tweet, \
-    get_tweet_likes, get_pregenerated_tweet
+from app.api.db import (
+    get_pregenerated_tweet,
+    get_tweet,
+    get_tweet_likes,
+    get_user_impressions,
+    seed_impressions,
+)
+from app.api.endpoints.prompts import (
+    day_quote,
+    eg_prompt,
+    liked_prefix,
+    liked_suffix,
+    user_spec,
+)
 from app.config import supabase
 from app.constants import (
+    IMPRESSION_TABLE_CHILD_LIKE_COUNT,
+    IMPRESSION_TABLE_LIKED,
+    IMPRESSION_TABLE_TWEET_ID,
+    TWEET_METADATA_PROMPT_TWEET_IDS,
+    TWEET_TABLE_AUTHOR,
+    TWEET_TABLE_CONTENT,
     TWEET_TABLE_ID,
-    TWEET_TABLE_AUTHOR, TWEET_TABLE_CONTENT, TWEET_TABLE_NAME,
-    IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, IMPRESSION_TABLE_LIKED,
-    TWEET_TABLE_METADATA, TWEET_METADATA_PROMPT_TWEET_IDS
+    TWEET_TABLE_METADATA,
+    TWEET_TABLE_NAME,
 )
-from app.api.endpoints.prompts import eg_prompt, user_spec, liked_suffix, liked_prefix, day_quote
 
 router = APIRouter()
 
@@ -44,7 +60,7 @@ def generate_post(user_id: str) -> dict:
             "id": tweet[TWEET_TABLE_ID],
             "author": tweet[TWEET_TABLE_AUTHOR],
             "content": tweet[TWEET_TABLE_CONTENT],
-            "likes": likes
+            "likes": likes,
         }
     else:
         impressions = get_user_impressions(user_id)
@@ -56,7 +72,7 @@ def generate_post(user_id: str) -> dict:
             TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
             TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
             TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT],
-            "likes": 0
+            "likes": 0,
         }
 
 
@@ -64,11 +80,17 @@ def compute_weights(impressions: List[dict]) -> List[float]:
     """"""
     weights = []
     total_weight_sum = sum(
-        [impression[IMPRESSION_TABLE_CHILD_LIKE_COUNT] + (10 * int(impression[IMPRESSION_TABLE_LIKED])) for impression in impressions]
+        [
+            impression[IMPRESSION_TABLE_CHILD_LIKE_COUNT]
+            + (10 * int(impression[IMPRESSION_TABLE_LIKED]))
+            for impression in impressions
+        ]
     )
     for impression in impressions:
-        curr_sum = impression[IMPRESSION_TABLE_CHILD_LIKE_COUNT] + (10 *int(impression[IMPRESSION_TABLE_LIKED]))
-        weights.append(float(curr_sum)/total_weight_sum)
+        curr_sum = impression[IMPRESSION_TABLE_CHILD_LIKE_COUNT] + (
+            10 * int(impression[IMPRESSION_TABLE_LIKED])
+        )
+        weights.append(float(curr_sum) / total_weight_sum)
 
     return weights
 
@@ -125,13 +147,13 @@ def generate_tweet_from_impressions(impressions: List[dict]) -> dict:
     if len(loaded_dict) == 0:
         return loaded_dict
 
-    impression_ids = [impression[IMPRESSION_TABLE_TWEET_ID] for impression in impressions]
+    impression_ids = [
+        impression[IMPRESSION_TABLE_TWEET_ID] for impression in impressions
+    ]
 
     return_dict = {
         TWEET_TABLE_CONTENT: loaded_dict["tweet"],
         TWEET_TABLE_AUTHOR: loaded_dict["user"],
-        TWEET_TABLE_METADATA: {
-            TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids
-        }
+        TWEET_TABLE_METADATA: {TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids},
     }
     return return_dict
