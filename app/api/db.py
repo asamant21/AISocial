@@ -64,6 +64,27 @@ def get_user_tweet_view(tweet_id: int, user_id: str) -> dict:
     return {**tweet, "liked": user_impression[IMPRESSION_TABLE_LIKED], "likes": likes}
 
 
+def get_user_liked_tweets(user_id: str) -> List[dict]:
+    """Retrieve all tweets liked by a user."""
+    like_impressions = get_user_like_impressions(user_id)
+    tweet_ids = [i[IMPRESSION_TABLE_TWEET_ID] for i in like_impressions]
+    user_tweet_views = [get_user_tweet_view(tid, user_id) for tid in tweet_ids]
+    return user_tweet_views
+
+
+def get_user_like_impressions(user_id: str) -> List[dict]:
+    """Get all direct like impressions for a user."""
+    impressions = (
+        supabase.table(IMPRESSION_TABLE_NAME)
+            .select("*")
+            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+            .filter(IMPRESSION_TABLE_LIKED, "eq", SUPABASE_TRUE_VAL)
+            .execute()
+            .data
+    )
+    return impressions
+
+
 def get_pregenerated_tweet() -> dict:
     """"""
     token = f"Bearer {key}"
