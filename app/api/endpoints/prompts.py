@@ -19,8 +19,9 @@ Output:"""
 
 user_spec = """
 Guidelines for creating a user:
-- if the tweets above are similar in style or person, use one of the user names above. otherwise, create a fake user name
-- If using a user name above, make it the most common one provided in the examples
+- Use the username of the author of the reference tweet.
+- If multiple reference tweets are provided, use the most common username among the reference tweets.
+- If you can't decide on a common username, create a fake username.
 - If creating a fake user name, include numbers in the user name and don't be alliterative
 
 Output:"""
@@ -40,7 +41,7 @@ Using the provided tweets and the guidelines below, write a tweet that the user 
 The tweets are provided in the following JSON Format:
 {{
     "tweet": the content of the tweet.  Use this to understand the style, topics, idioms, personalities and tones that the user likes.
-    "user": the user name of the tweeter
+    "user_name": the user name of the tweeter
 }}.
 """
 
