@@ -3,15 +3,18 @@ import {
   useSupabaseClient,
   useUser
 } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/router';
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
+import Feed from '@/components/Feed';
 import { useEffect, useState } from 'react';
 
 const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
   const user = useUser();
   const supabaseClient = useSupabaseClient();
+  const router = useRouter();
 
   const [data, setData] = useState(null);
 
@@ -24,53 +27,41 @@ const LoginPage: NextPage = () => {
     if (user) loadData();
   }, [user, supabaseClient]);
 
+  useEffect(() => {
+    const timeout = setInterval(() => {
+      supabaseClient.auth.refreshSession()
+    }, 5 * 60 * 1000);
+    return () => {
+      clearInterval(timeout);
+    }
+  }, [user, supabaseClient]);
+
   if (!session)
     return (
-      <>
-        {error && <p>{error.message}</p>}
-        {isLoading ? <h1>Loading...</h1> : <h1>Loaded!</h1>}
-        <button
-          onClick={() => {
-            supabaseClient.auth.signInWithOAuth({
-              provider: 'twitter',
-              options: { redirectTo: 'http://localhost:3000' }
-            });
-          }}
-        >
-          Login with github
-        </button>
+      <div className="w-screen h-screen">
         <Auth
           redirectTo="http://localhost:3000"
           appearance={{ theme: ThemeSupa }}
-          // view="update_password"
           supabaseClient={supabaseClient}
           providers={['twitter']}
-          // scopes={{github: 'repo'}} // TODO: enable scopes in Auth component.
           socialLayout="horizontal"
+          // onlyThirdPartyProviders
         />
-      </>
+      </div>
     );
 
   return (
-    <>
-      <p>
-        <button
-          onClick={() =>
-            supabaseClient.auth.updateUser({ data: { test1: 'updated' } })
-          }
-        >
-          Update user metadata
-        </button>
-        <button onClick={() => supabaseClient.auth.refreshSession()}>
-          Refresh session
-        </button>
-      </p>
-      {isLoading ? <h1>Loading...</h1> : <h1>Loaded!</h1>}
-      <p>user:</p>
-      <pre>{JSON.stringify(session, null, 2)}</pre>
-      <p>client-side data fetching with RLS</p>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
-    </>
+    <div className="w-screen h-screen bg-[#15202b] text-white">
+      <button
+        onClick={async () => {
+          await supabaseClient.auth.signOut();
+          router.push('/');
+        }}
+      >
+        Logout
+      </button>
+      <Feed />
+    </div>
   );
 };
 
