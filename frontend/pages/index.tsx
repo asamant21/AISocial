@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import Feed from '@/components/Feed';
+import Feed from '../components/Feed';
 import { useEffect, useState } from 'react';
 
 const LoginPage: NextPage = () => {
