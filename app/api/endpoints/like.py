@@ -3,16 +3,26 @@
 from fastapi import APIRouter, Depends
 
 from app.api import deps
-from app.api.db import get_tweet, add_direct_impression, get_impression, \
-    add_prompt_impression, update_prompt_impression
-from app.constants import TWEET_METADATA_PROMPT_TWEET_IDS, IMPRESSION_TABLE_NAME, \
-    TWEET_TABLE_METADATA
+from app.api.db import (
+    add_direct_impression,
+    add_prompt_impression,
+    get_impression,
+    get_tweet,
+    update_prompt_impression,
+)
+from app.constants import (
+    IMPRESSION_TABLE_NAME,
+    TWEET_METADATA_PROMPT_TWEET_IDS,
+    TWEET_TABLE_METADATA,
+)
 
 router = APIRouter()
 
 
 @router.get("/{tweet_id}")
-def like(tweet_id: int, current_user: str = Depends(deps.get_current_user), level: int = 0):
+def like(
+    tweet_id: int, current_user: str = Depends(deps.get_current_user), level: int = 0
+):
     """Like a tweet by id."""
     if level > 1:
         return
@@ -39,4 +49,4 @@ def like(tweet_id: int, current_user: str = Depends(deps.get_current_user), leve
         return
     prompt_examples = metadata.get(TWEET_METADATA_PROMPT_TWEET_IDS, {})
     for prompt_tweet_id in prompt_examples:
-        like(prompt_tweet_id, current_user, level+1)
+        like(prompt_tweet_id, current_user, level + 1)

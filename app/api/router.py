@@ -1,6 +1,7 @@
 """Initialize routers."""
 
 from fastapi import APIRouter
+
 from app.api.endpoints import generate, like
 
 api_router = APIRouter()

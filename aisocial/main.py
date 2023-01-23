@@ -2,7 +2,7 @@
 import random
 
 from aisocial.Post import BasePost, generate_image_post, generate_text_post
-from aisocial.Topic import retrieve_seed_topics, generate_new_topics
+from aisocial.Topic import generate_new_topics, retrieve_seed_topics
 
 
 def cull_topics_and_add_new() -> None:

@@ -1,11 +1,14 @@
 """Streamlit server file."""
-import streamlit as st
-import aisocial
 from typing import Dict, List
+
+import streamlit as st
 from streamlit_tags import st_tags
+
+import aisocial
 from aisocial.main import generate_post
-from aisocial.Post import BasePost, TextPost, ImagePost
-from aisocial.Topic import BaseTopic, generate_new_topics, add_user_recommended_topics
+from aisocial.Post import BasePost, ImagePost, TextPost
+from aisocial.Topic import (BaseTopic, add_user_recommended_topics,
+                            generate_new_topics)
 
 MAX_SEED_TOPICS_NUM = 50
 

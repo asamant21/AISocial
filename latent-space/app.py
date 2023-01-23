@@ -1,34 +1,36 @@
 import json
-
-from flask import Flask, abort, request
-from flask_cors import CORS
 from typing import List, Type, Union
-from flask import jsonify
+
 import numpy as np
+from flask import Flask, abort, jsonify, request
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.debug = True
 CORS(app)
 
 import json
+
 with open('../langchain/notebooks/tweets.json', 'r') as f:
     tweets_config = json.load(f)
 
 import pandas as pd
+
 df = pd.DataFrame(tweets_config)
 
 df['weight'] = 1
 
+from typing import Any, Dict, List
+
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
 from langchain.prompts.example_selector.base import BaseExampleSelector
 
-from typing import Any, Dict, List
-from langchain.prompts.example_selector.base import BaseExampleSelector
-from langchain.prompts import PromptTemplate
-from langchain.llms import OpenAI
 llm = OpenAI()
+import contextlib
+
 from langchain.chains import LLMChain
 
-import contextlib
 CONTEXT = {}
 ID_TO_INDS = {}
 GLOBAL_INFO = {}
@@ -66,6 +68,7 @@ eg_template = """"content": {tweet}
 """
 eg_prompt = PromptTemplate(template=eg_template, input_variables=["user", "tweet"])
 from langchain.prompts import FewShotPromptTemplate
+
 eg_selector = CustomExampleSelector(df)
 prompt_temp = FewShotPromptTemplate(prefix=prefix, suffix=suffix, example_prompt=eg_prompt, example_selector=eg_selector, input_variables=[])
 

@@ -2,20 +2,28 @@
 from typing import List
 
 from app.config import supabase
-from app.constants import IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, \
-    SEED_TWEET_IDS, IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, \
-    TWEET_TABLE_NAME, TWEET_TABLE_ID, IMPRESSION_TABLE_LIKED, SUPABASE_TRUE_VAL, \
-    IMPRESSION_TABLE_ID
+from app.constants import (
+    IMPRESSION_TABLE_CHILD_LIKE_COUNT,
+    IMPRESSION_TABLE_ID,
+    IMPRESSION_TABLE_LIKED,
+    IMPRESSION_TABLE_NAME,
+    IMPRESSION_TABLE_TWEET_ID,
+    IMPRESSION_TABLE_USER_ID,
+    SEED_TWEET_IDS,
+    SUPABASE_TRUE_VAL,
+    TWEET_TABLE_ID,
+    TWEET_TABLE_NAME,
+)
 
 
 def get_user_impressions(user_id: str) -> List[dict]:
     """Return all the impressions for a user."""
     impressions = (
         supabase.table(IMPRESSION_TABLE_NAME)
-            .select("*")
-            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-            .execute()
-            .data
+        .select("*")
+        .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+        .execute()
+        .data
     )
     return impressions
 
@@ -27,7 +35,9 @@ def seed_impressions(user_id: str) -> None:
             IMPRESSION_TABLE_TWEET_ID: tweet_id,
             IMPRESSION_TABLE_CHILD_LIKE_COUNT: 1,
         }
-        insert_resp = supabase.table(IMPRESSION_TABLE_NAME).insert(impression).execute().data
+        insert_resp = (
+            supabase.table(IMPRESSION_TABLE_NAME).insert(impression).execute().data
+        )
         assert len(insert_resp) > 0
 
 
@@ -35,10 +45,10 @@ def get_tweet(tweet_id: int) -> dict:
     """Retrieve tweet based on id."""
     tweet = (
         supabase.table(TWEET_TABLE_NAME)
-            .select("*")
-            .filter(TWEET_TABLE_ID, "eq", tweet_id)
-            .execute()
-            .data[0]
+        .select("*")
+        .filter(TWEET_TABLE_ID, "eq", tweet_id)
+        .execute()
+        .data[0]
     )
     return tweet
 
@@ -47,11 +57,11 @@ def get_tweet_likes(tweet_id: int) -> int:
     """Retrieve number of direct tweet likes."""
     likes = (
         supabase.table(IMPRESSION_TABLE_NAME)
-            .select("*")
-            .filter(IMPRESSION_TABLE_TWEET_ID, "eq", tweet_id)
-            .filter(IMPRESSION_TABLE_LIKED, "eq", SUPABASE_TRUE_VAL)
-            .execute()
-            .data
+        .select("*")
+        .filter(IMPRESSION_TABLE_TWEET_ID, "eq", tweet_id)
+        .filter(IMPRESSION_TABLE_LIKED, "eq", SUPABASE_TRUE_VAL)
+        .execute()
+        .data
     )
     return len(likes)
 
@@ -61,7 +71,7 @@ def add_direct_impression(tweet_id: int, user_id: str) -> None:
     direct_impression = {
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
         IMPRESSION_TABLE_USER_ID: user_id,
-        IMPRESSION_TABLE_LIKED: SUPABASE_TRUE_VAL
+        IMPRESSION_TABLE_LIKED: SUPABASE_TRUE_VAL,
     }
     insert_resp = (
         supabase.table(IMPRESSION_TABLE_NAME).insert(direct_impression).execute().data
@@ -73,11 +83,11 @@ def get_impression(tweet_id: int, user_id: str) -> dict:
     """Retrieve impression based on tweet and user id."""
     impression = (
         supabase.table(IMPRESSION_TABLE_NAME)
-            .select("*")
-            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-            .filter(IMPRESSION_TABLE_TWEET_ID, "eq", tweet_id)
-            .execute()
-            .data
+        .select("*")
+        .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+        .filter(IMPRESSION_TABLE_TWEET_ID, "eq", tweet_id)
+        .execute()
+        .data
     )
     return impression
 
@@ -87,10 +97,11 @@ def add_prompt_impression(tweet_id: int, user_id: str) -> None:
     impression = {
         IMPRESSION_TABLE_USER_ID: user_id,
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
-        IMPRESSION_TABLE_CHILD_LIKE_COUNT: 1
+        IMPRESSION_TABLE_CHILD_LIKE_COUNT: 1,
     }
-    insert_resp = supabase.table(IMPRESSION_TABLE_NAME).insert(
-        impression).execute().data
+    insert_resp = (
+        supabase.table(IMPRESSION_TABLE_NAME).insert(impression).execute().data
+    )
     assert len(insert_resp) > 0
 
 
@@ -100,9 +111,9 @@ def update_prompt_impression(impression: dict) -> None:
     impression_id = impression[IMPRESSION_TABLE_ID]
     update_resp = (
         supabase.table(IMPRESSION_TABLE_NAME)
-            .update({IMPRESSION_TABLE_CHILD_LIKE_COUNT: count + 1})
-            .filter(IMPRESSION_TABLE_ID, "eq", impression_id)
-            .execute()
-            .data
+        .update({IMPRESSION_TABLE_CHILD_LIKE_COUNT: count + 1})
+        .filter(IMPRESSION_TABLE_ID, "eq", impression_id)
+        .execute()
+        .data
     )
     assert len(update_resp) > 0

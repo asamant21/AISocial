@@ -1,6 +1,6 @@
-from langchain.prompts import PromptTemplate
-from langchain.llms import OpenAI
 from langchain.chains import LLMChain
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
 
 llm = OpenAI()
 
@@ -22,6 +22,7 @@ template = """The following is a tweet from {user} about {topic}:
 prompt = PromptTemplate(template=template, input_variables=["user", "topic"])
 
 import random
+
 chain = LLMChain(llm=llm, prompt=prompt)
 
 tweets_config = []
@@ -36,6 +37,7 @@ for i in range(len(tweets_config)):
     tweets_config[i]['tweet'] = tweets[i]['text']
 
 import json
+
 with open('tweets.json', 'w') as f:
     json.dump(tweets_config, f)
 

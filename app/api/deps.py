@@ -1,15 +1,11 @@
 """Dependencies for endpoints."""
 
-from fastapi import HTTPException, status, Header
+from fastapi import Header, HTTPException, status
 
 from app.config import supabase as client
 
 
-
-
-def get_current_user(
-        authorization: str = Header(None)
-) -> str:
+def get_current_user(authorization: str = Header(None)) -> str:
     """User either a jwt token or api key to get the current user."""
     if authorization is None:
         raise HTTPException(
@@ -31,4 +27,3 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
-

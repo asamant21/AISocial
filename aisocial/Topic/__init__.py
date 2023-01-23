@@ -1,5 +1,7 @@
 from typing import Dict, List
+
 import numpy as np
+
 from aisocial.Topic.base import BaseTopic
 from aisocial.Topic.generate import format_topics_for_prompt, generate_topics
 
