@@ -49,8 +49,8 @@ liked_suffix = (
     tweet_json_format
     + """
 Guidelines for Creating Your Own Tweet:
-- Use a style and tone imitating those in the tweets above.
-- Write with a personality imitating the tweets above.
+- Use a style and tone similar to those in the tweets above.
+- Write with a personality similar to the tweets above.
 - Reflect the users' perspective, interests, and beliefs.
 - Irony and absurdity is strongly encouraged
 - Creativity is encouraged
