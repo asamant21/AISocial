@@ -79,7 +79,7 @@ def convert_impressions_to_examples(impressions: List[dict]) -> List[str]:
 
 
 def choose_impressions(weights: List[float], impressions: List[dict]) -> List[dict]:
-    chosen_impressions = np.random.choice(impressions, size=4, p=weights)
+    chosen_impressions = np.random.choice(impressions, size=2, p=weights)
     return chosen_impressions
 
 

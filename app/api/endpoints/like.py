@@ -14,7 +14,7 @@ router = APIRouter()
 @router.get("/{tweet_id}")
 def like(tweet_id: int, current_user: str = Depends(deps.get_current_user), level: int = 0):
     """Like a tweet by id."""
-    if level > 2:
+    if level > 1:
         return
 
     impression = get_impression(tweet_id, current_user)
