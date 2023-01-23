@@ -1,7 +1,9 @@
 """"""
 from typing import List
 
-from app.config import supabase
+import requests
+
+from app.config import key, supabase, url
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_ID,
@@ -51,6 +53,15 @@ def get_tweet(tweet_id: int) -> dict:
         .data[0]
     )
     return tweet
+
+
+def get_pregenerated_tweet() -> dict:
+    token = f"Bearer {key}"
+    request_url = f"{url}/rest/v1/rpc/get_random_tweet"
+    res = requests.request(
+        "GET", request_url, headers={"Authorization": token, "apikey": key}
+    )
+    return res.json()[0]
 
 
 def get_tweet_likes(tweet_id: int) -> int:
