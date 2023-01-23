@@ -9,7 +9,7 @@ interface Props {
 
 const Feed = ({ tweets: tweetList }: Props) => {
   const [tweets, setTweets] = useState(tweetList ?? []);
-  const generateTweet = useRequestCallback('/generate');
+  const generateTweet = useRequestCallback('/generate/continue');
 
   const handleGenerate = useCallback(() => {
     generateTweet().then(res => {
