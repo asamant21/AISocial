@@ -1,6 +1,7 @@
 """Endpoints for generating tweets."""
 from typing import List
 import numpy as np
+import random
 from datetime import datetime
 import json
 
@@ -9,7 +10,7 @@ from langchain.llms import OpenAI
 
 from app.api import deps, schemas
 from app.api.db import get_user_impressions, seed_impressions, get_tweet, \
-    get_tweet_likes
+    get_tweet_likes, get_pregenerated_tweet
 from app.config import supabase
 from app.constants import (
     TWEET_TABLE_ID,
@@ -33,9 +34,11 @@ def generate_post(user_id: str) -> dict:
     impressions = get_user_impressions(user_id)
     if len(impressions) == 0:
         seed_impressions(user_id)
-    use_pregenerated = False
+
+    random_val = random.uniform(0, 1)
+    use_pregenerated = len(impressions) < 30 and random_val < 0.5
     if use_pregenerated:
-        tweet = {}  # get_existing_tweet()
+        tweet = get_pregenerated_tweet()
         likes = get_tweet_likes(tweet[TWEET_TABLE_ID])
         return {
             "id": tweet[TWEET_TABLE_ID],
@@ -52,7 +55,7 @@ def generate_post(user_id: str) -> dict:
         return {
             TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
             TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
-            TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
+            TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT],
             "likes": 0
         }
 
