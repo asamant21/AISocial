@@ -1,7 +1,7 @@
 """"""
 from typing import List
 import requests
-from app.config import key
+from app.config import key, url
 
 from app.config import supabase
 from app.constants import IMPRESSION_TABLE_NAME, IMPRESSION_TABLE_USER_ID, \
@@ -47,7 +47,7 @@ def get_tweet(tweet_id: int) -> dict:
 
 def get_pregenerated_tweet() -> dict:
     token = f"Bearer {key}"
-    request_url = "https://qcmbuvytqonaseejrbmw.supabase.co/rest/v1/rpc/get_random_tweet"
+    request_url = f"{url}/rest/v1/rpc/get_random_tweet"
     res = requests.request("GET", request_url, headers={"Authorization": token, "apikey": key})
     return res.json()[0]
 
