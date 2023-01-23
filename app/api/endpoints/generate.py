@@ -33,7 +33,7 @@ def generate_post(user_id: str) -> dict:
     if len(impressions) == 0:
         seed_impressions(user_id)
         impressions = get_user_impressions(user_id)
-    explore_raw_latent = len(impressions) > 10
+    explore_raw_latent = len(impressions) < 3
     weights = compute_weights(impressions)
     chosen_impressions = choose_impressions(weights, impressions)
     tweet = generate_tweet_from_impressions(chosen_impressions, explore_raw_latent)
@@ -79,7 +79,7 @@ def convert_impressions_to_examples(impressions: List[dict]) -> List[str]:
 
 
 def choose_impressions(weights: List[float], impressions: List[dict]) -> List[dict]:
-    chosen_impressions = np.random.choice(impressions, size=2, p=weights)
+    chosen_impressions = np.random.choice(impressions, size=2, replace=False, p=weights)
     return chosen_impressions
 
 
@@ -93,6 +93,7 @@ def generate_tweet_from_impressions(impressions: List[dict], explore_raw_latent:
         full_prefix = liked_prefix + day_prefix
         full_prompt = full_prefix + eg + liked_suffix + user_spec
 
+    print(full_prompt)
     curr_temp = 1.0
 
     llm = OpenAI(temperature=curr_temp)
@@ -122,5 +123,4 @@ def generate_tweet_from_impressions(impressions: List[dict], explore_raw_latent:
             TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids
         }
     }
-    print(return_dict)
     return return_dict
