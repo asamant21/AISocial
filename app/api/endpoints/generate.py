@@ -52,7 +52,7 @@ def generate_post(user_id: str) -> dict:
         return {
             TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
             TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
-            TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
+            TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT],
             "likes": 0
         }
 
