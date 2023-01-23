@@ -8,7 +8,8 @@ from fastapi import APIRouter, Depends
 from langchain.llms import OpenAI
 
 from app.api import deps, schemas
-from app.api.db import get_user_impressions, seed_impressions, get_tweet
+from app.api.db import get_user_impressions, seed_impressions, get_tweet, \
+    get_tweet_likes
 from app.config import supabase
 from app.constants import (
     TWEET_TABLE_ID,
@@ -31,15 +32,27 @@ def generate_post(user_id: str) -> dict:
     impressions = get_user_impressions(user_id)
     if len(impressions) == 0:
         seed_impressions(user_id)
-    weights = compute_weights(impressions)
-    examples = choose_examples(weights, impressions)
-    tweet = generate_tweet_from_examples(examples)
-    insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
-    return {
-        TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
-        TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
-        TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT]
-    }
+    use_pregenerated = False
+    if use_pregenerated:
+        tweet = {}  # get_existing_tweet()
+        likes = get_tweet_likes(tweet[TWEET_TABLE_ID])
+        return {
+            "id": tweet[TWEET_TABLE_ID],
+            "author": tweet[TWEET_TABLE_AUTHOR],
+            "content": tweet[TWEET_TABLE_CONTENT],
+            "likes": likes
+        }
+    else:
+        weights = compute_weights(impressions)
+        examples = choose_examples(weights, impressions)
+        tweet = generate_tweet_from_examples(examples)
+        insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
+        return {
+            "id": insert_resp[TWEET_TABLE_ID],
+            "author": insert_resp[TWEET_TABLE_AUTHOR],
+            "content": insert_resp[TWEET_TABLE_CONTENT],
+            "likes": 0,
+        }
 
 
 def compute_weights(impressions: List[dict]) -> List[float]:

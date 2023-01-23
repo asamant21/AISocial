@@ -20,7 +20,7 @@ def get_user_impressions(user_id: str) -> List[dict]:
     return impressions
 
 
-def seed_impressions(user_id: str) -> List[dict]:
+def seed_impressions(user_id: str) -> None:
     for tweet_id in SEED_TWEET_IDS:
         impression = {
             IMPRESSION_TABLE_USER_ID: user_id,
@@ -41,6 +41,19 @@ def get_tweet(tweet_id: int) -> dict:
             .data[0]
     )
     return tweet
+
+
+def get_tweet_likes(tweet_id: int) -> int:
+    """Retrieve number of direct tweet likes."""
+    likes = (
+        supabase.table(IMPRESSION_TABLE_NAME)
+            .select("*")
+            .filter(IMPRESSION_TABLE_TWEET_ID, "eq", tweet_id)
+            .filter(IMPRESSION_TABLE_LIKED, "eq", SUPABASE_TRUE_VAL)
+            .execute()
+            .data
+    )
+    return len(likes)
 
 
 def add_direct_impression(tweet_id: int, user_id: str) -> None:

@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field, validator, EmailStr
+""""""
+from pydantic import BaseModel
 
 
 class Tweet(BaseModel):
