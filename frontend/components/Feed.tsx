@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import TweetItem from "./Tweet";
-import { Tweet } from "../lib/types";
-import { useRequestCallback } from "../lib/api";
+import { Tweet } from "@/lib/types";
+import { useRequestCallback } from "@/lib/api";
 
 interface Props {
   tweets?: Tweet[];

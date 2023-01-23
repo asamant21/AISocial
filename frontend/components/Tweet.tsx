@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Tweet } from "../lib/types";
-import { useRequestCallback } from "../lib/api";
+import { Tweet } from "@/lib/types";
+import { useRequestCallback } from "@/lib/api";
 
 interface Props {
   tweet: Tweet
