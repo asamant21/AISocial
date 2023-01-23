@@ -40,7 +40,7 @@ const LoginPage: NextPage = () => {
     return (
       <div className="w-screen h-screen">
         <Auth
-          redirectTo="http://localhost:3000"
+          redirectTo={process.env.HOST}
           appearance={{ theme: ThemeSupa }}
           supabaseClient={supabaseClient}
           providers={['twitter']}
