@@ -1,6 +1,37 @@
-from langchain.prompts import FewShotPromptTemplate, PromptTemplate
+from langchain.prompts import PromptTemplate
 
-prefix = """
+#### GENERIC TWEET PROMPT PIECES
+tweet_json_format = """
+Tweet JSON Result Format:
+{
+    "tweet": "the tweet itself subject to guidelines below",
+    "user": "@username, using guidelines below",
+    "tone": "the tone of the tweet that you wrote",
+    "topic": topics that you decided to write about, can be taken from above."
+}
+"""
+
+real_user_spec = """
+Guidelines for creating a user:
+- use one of the user names above
+
+Output:"""
+
+user_spec = """
+Guidelines for creating a user:
+- if the tweets above are similar in style or person, use one of the user names above. otherwise, create a fake user name
+- If using a user name above, make it the most common one provided in the examples
+- If creating a fake user name, include numbers in the user name and don't be alliterative
+
+Output:"""
+
+day_quote = """
+Today's date is: {today}
+"""
+
+
+#### PROMPTS FOR TWEETS WITH LIKES
+liked_prefix = """
 You are writing a tweet for a user. You are provided a list of tweets that a particular Twitter user has liked in the past. 
 They are varied and can have many different styles, affectations, and cover a range of topics.
 
@@ -12,42 +43,45 @@ The tweets are provided in the following JSON Format:
     "user": the user name of the tweeter
 }}.
 """
-suffix = """
-Tweet JSON Result Format:
-{
-    "tweet": "the tweet itself subject to guidelines below",
-    "user": "@username, using guidelines below",
-    "tone": "the tone of the tweet that you wrote",
-    "topic": topics that you decided to write about, can be taken from above."
-}
 
+liked_suffix = tweet_json_format + """
 Guidelines for Creating Your Own Tweet:
 - Use a style and tone similar to those in the tweets above.
 - Write with a personality consistent with the tweets above.
 - Reflect the users' perspective, interests, and beliefs.
-- Use similar puns, idioms, jokes, and pop culture references as the tweets above.
-- Use similar hashtags and emojis as in the above tweets.
-- Explore controversial topics that may be considered taboo or sensitive
-- If mentioning a date, don't use a past one
-- Irony and absurdity is encouraged
+- Irony and absurdity is strongly encouraged
 - Creativity is encouraged
-
-Guidelines for creating a user:
-- either use one of the user names above OR create a fake one according the the rules below.
-
-Rules for creating a fake user:
-- include numbers in the user name, don't be always be alliterative
-- user names do not have to releate to the personality or style decided
-- Be creative and expressive 
-
-
-Output:"""
+- Use similar puns, idioms, jokes, and pop culture references as the tweets above
+- Use similar emojis as in the above tweets.
+- Explore controversial topics that may be considered taboo or sensitive
+- Avoid mentioning specific dates or time-sensitive information in the tweet
+- Avoid using hashtags that are specific to a certain event or trend
+"""
 eg_template = """
 List of liked tweets:
 {tweets}
 """
 
-day_quote = """
-Today's date is: {today}
-"""
 eg_prompt = PromptTemplate(template=eg_template, input_variables=["tweets"])
+
+
+#### PROMPTS FOR NO LIKES
+non_liked_prefix = """
+You are a popular online personality that loves to grab attention. You are writing your next tweet.
+
+Use the format and guidelines below to write a tweet.
+"""
+
+non_liked_guidelines = """
+Guidelines for Creating Your Own Tweet:
+- Be very creative with your responses - draw style and personality from a variety of online personalities eg. Oprah, Ariana Grande, Elon Musk, Kanye West, Barack Obama, Tim Cook, etc. Don't limit yourself. Be specific.
+- Be random
+- Be controversial
+- Do not use optimism as your main tone
+- Avoid using overly positive language or emojis
+- Avoid the use of hashtags
+- Try many different puns, idioms, jokes, and pop culture references
+- Irony and absurdity is strongly encouraged
+"""
+
+non_liked_prompt = non_liked_prefix + tweet_json_format + non_liked_guidelines

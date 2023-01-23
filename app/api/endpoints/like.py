@@ -12,21 +12,31 @@ router = APIRouter()
 
 
 @router.get("/{tweet_id}")
-def like(tweet_id: int, current_user: str = Depends(deps.get_current_user)):
+def like(tweet_id: int, current_user: str = Depends(deps.get_current_user), level: int = 0):
     """Like a tweet by id."""
-    add_direct_impression(tweet_id, current_user)
+    if level > 2:
+        return
+
+    impression = get_impression(tweet_id, current_user)
+
+    if len(impression) > 1:
+        raise ValueError(
+            f"Duplicate user <> tweet impression stored in {IMPRESSION_TABLE_NAME}"
+            f" table."
+        )
+
+    if len(impression) == 0 and level == 0:
+        add_direct_impression(tweet_id, current_user)
+    elif len(impression) == 0:
+        add_prompt_impression(tweet_id, current_user)
+    else:
+        update_prompt_impression(impression[0])
+
     tweet = get_tweet(tweet_id)
-    prompt_examples = tweet[TWEET_TABLE_METADATA][TWEET_METADATA_PROMPT_TWEET_IDS]
+    metadata = tweet.get(TWEET_TABLE_METADATA)
+
+    if metadata is None:
+        return
+    prompt_examples = metadata.get(TWEET_METADATA_PROMPT_TWEET_IDS, {})
     for prompt_tweet_id in prompt_examples:
-        existing_impression = get_impression(prompt_tweet_id, current_user)
-        if len(existing_impression) == 0:
-            add_prompt_impression(prompt_tweet_id, current_user)
-        elif len(existing_impression) == 1:
-            update_prompt_impression(existing_impression[0])
-        else:
-            raise ValueError(
-                f"Duplicate user <> tweet impression stored in {IMPRESSION_TABLE_NAME}"
-                f" table."
-            )
-
-
+        like(prompt_tweet_id, current_user, level+1)
