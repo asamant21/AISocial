@@ -93,7 +93,6 @@ def generate_tweet_from_impressions(impressions: List[dict], explore_raw_latent:
         full_prefix = liked_prefix + day_prefix
         full_prompt = full_prefix + eg + liked_suffix + user_spec
 
-    print(full_prompt)
     curr_temp = 1.0
 
     llm = OpenAI(temperature=curr_temp)
