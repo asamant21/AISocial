@@ -16,7 +16,7 @@ from app.constants import (
     IMPRESSION_TABLE_TWEET_ID, IMPRESSION_TABLE_CHILD_LIKE_COUNT, IMPRESSION_TABLE_LIKED,
     TWEET_TABLE_METADATA, TWEET_METADATA_PROMPT_TWEET_IDS
 )
-from app.api.endpoints.prompts import eg_prompt, non_liked_prompt, user_spec, liked_suffix, liked_prefix, day_quote
+from app.api.endpoints.prompts import eg_prompt, user_spec, liked_suffix, liked_prefix, day_quote
 
 router = APIRouter()
 
@@ -33,10 +33,10 @@ def generate_post(user_id: str) -> dict:
     if len(impressions) == 0:
         seed_impressions(user_id)
         impressions = get_user_impressions(user_id)
-    explore_raw_latent = len(impressions) < 3
+
     weights = compute_weights(impressions)
     chosen_impressions = choose_impressions(weights, impressions)
-    tweet = generate_tweet_from_impressions(chosen_impressions, explore_raw_latent)
+    tweet = generate_tweet_from_impressions(chosen_impressions)
     insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
     return {
         TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
@@ -83,15 +83,12 @@ def choose_impressions(weights: List[float], impressions: List[dict]) -> List[di
     return chosen_impressions
 
 
-def generate_tweet_from_impressions(impressions: List[dict], explore_raw_latent: bool) -> dict:
-    if explore_raw_latent:
-        full_prompt = non_liked_prompt + user_spec
-    else:
-        examples = convert_impressions_to_examples(impressions)
-        eg = eg_prompt.format(tweets=str(examples))
-        day_prefix = day_quote.format(today=str(datetime.today().date()))
-        full_prefix = liked_prefix + day_prefix
-        full_prompt = full_prefix + eg + liked_suffix + user_spec
+def generate_tweet_from_impressions(impressions: List[dict]) -> dict:
+    examples = convert_impressions_to_examples(impressions)
+    eg = eg_prompt.format(tweets=str(examples))
+    day_prefix = day_quote.format(today=str(datetime.today().date()))
+    full_prefix = liked_prefix + day_prefix
+    full_prompt = full_prefix + eg + liked_suffix + user_spec
 
     curr_temp = 1.0
 
