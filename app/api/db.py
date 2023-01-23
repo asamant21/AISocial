@@ -56,6 +56,14 @@ def get_tweet(tweet_id: int) -> dict:
     return tweet
 
 
+def get_user_tweet_view(tweet_id: int, user_id: str) -> dict:
+    """Retrieve a tweet along with liked status for the current user and total likes."""
+    tweet = get_tweet(tweet_id)
+    user_impression = get_impression(tweet_id, user_id)
+    likes = get_tweet_likes(tweet_id)
+    return {**tweet, "liked": user_impression[IMPRESSION_TABLE_LIKED], "likes": likes}
+
+
 def get_pregenerated_tweet() -> dict:
     """"""
     token = f"Bearer {key}"

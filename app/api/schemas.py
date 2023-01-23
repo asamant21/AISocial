@@ -6,3 +6,7 @@ class Tweet(BaseModel):
     content: str
     author: str
     likes: int
+
+
+class UserTweetView(Tweet):
+    liked: bool
