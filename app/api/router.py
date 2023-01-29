@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from app.api.endpoints import generate, like, retrieve_tweet, retrieve_likes, regenerate
+from app.api.endpoints import generate, like, regenerate, retrieve_likes, retrieve_tweet
 
 api_router = APIRouter()
 api_router.include_router(generate.router, prefix="/generate", tags=["generate"])

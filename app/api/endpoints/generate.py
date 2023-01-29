@@ -11,11 +11,11 @@ from langchain.llms import OpenAI
 from app.api import deps, schemas
 from app.api.db import (
     get_pregenerated_tweet,
+    get_seed_impressions,
     get_tweet,
     get_tweet_likes,
     get_user_impressions,
     seed_impressions,
-    get_seed_impressions,
 )
 from app.api.endpoints.prompts import (
     day_quote,
@@ -41,23 +41,20 @@ router = APIRouter()
 
 
 @router.get("", response_model=schemas.Tweet)
-def generate(current_user: str = Depends(deps.get_current_user)):
+def generate(
+    current_user: str = Depends(deps.get_current_user),
+    regen_time: datetime = Depends(deps.get_regen_time),
+):
     """Generate a tweet for the user."""
     print(current_user)
-    return generate_post(current_user)
+    return generate_post(current_user, regen_time)
 
 
-def generate_post(user_id: str, rerun_whole: bool = False) -> dict:
-    impressions = get_user_impressions(user_id, rerun_whole)
+def generate_post(user_id: str, regen_time: datetime = datetime.min) -> dict:
+    impressions = get_user_impressions(user_id, regen_time)
     if len(impressions) == 0:
-        # Rerunning whole returned nothing
-        if not rerun_whole:
-            impressions = get_seed_impressions(user_id)
-
-        # If length is still 0, then seed and get seed impressions
-        if len(impressions) == 0:
-            seed_impressions(user_id)
-            impressions = get_seed_impressions(user_id)
+        seed_impressions(user_id)
+        impressions = get_seed_impressions(user_id, regen_time)
 
     random_val = random.uniform(0, 1)
     use_pregenerated = len(impressions) < 30 and random_val < 0.5

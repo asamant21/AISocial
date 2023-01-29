@@ -1,17 +1,18 @@
 """Helper functions for interacting with the database."""
-from typing import List
 import random
 from datetime import datetime, timezone
+from typing import List
+
 import requests
 
 from app.config import key, supabase, url
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
+    IMPRESSION_TABLE_CREATED_TIME,
     IMPRESSION_TABLE_ID,
     IMPRESSION_TABLE_LIKED,
     IMPRESSION_TABLE_NAME,
     IMPRESSION_TABLE_TWEET_ID,
-    IMPRESSION_TABLE_CREATED_TIME,
     IMPRESSION_TABLE_USER_ID,
     SEED_TWEET_IDS,
     SUPABASE_TRUE_VAL,
@@ -20,38 +21,34 @@ from app.constants import (
 )
 
 
-def get_seed_impressions(user_id: str) -> List[dict]:
+def get_seed_impressions(
+    user_id: str, regen_time: datetime = datetime.min
+) -> List[dict]:
     """Return all seed impressions."""
     impressions = (
         supabase.table("Impression")
-            .select("*")
-            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-            .filter(IMPRESSION_TABLE_TWEET_ID, "in", tuple(SEED_TWEET_IDS))
-            .execute()
-            .data
+        .select("*")
+        .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+        .filter(IMPRESSION_TABLE_TWEET_ID, "in", tuple(SEED_TWEET_IDS))
+        .filter(IMPRESSION_TABLE_CREATED_TIME, "gt", regen_time)
+        .execute()
+        .data
     )
     return impressions
 
 
-def get_user_impressions(user_id: str, rerun_whole: bool = False) -> List[dict]:
-    """Return all the impressions for a user."""
-    if rerun_whole:
-        impressions = (
-            supabase.table("Impression")
-                .select("*")
-                .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-                .filter(IMPRESSION_TABLE_CREATED_TIME, "gt", datetime.now(timezone.utc))
-                .execute()
-                .data
-        )
-    else:
-        impressions = (
-            supabase.table(IMPRESSION_TABLE_NAME)
-            .select("*")
-            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-            .execute()
-            .data
-        )
+def get_user_impressions(
+    user_id: str, regen_time: datetime = datetime.min
+) -> List[dict]:
+    """Return all the impressions for a user after a generation time."""
+    impressions = (
+        supabase.table("Impression")
+        .select("*")
+        .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+        .filter(IMPRESSION_TABLE_CREATED_TIME, "gt", regen_time)
+        .execute()
+        .data
+    )
     return impressions
 
 
@@ -102,11 +99,11 @@ def get_user_like_impressions(user_id: str) -> List[dict]:
     """Get all direct like impressions for a user."""
     impressions = (
         supabase.table(IMPRESSION_TABLE_NAME)
-            .select("*")
-            .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-            .filter(IMPRESSION_TABLE_LIKED, "eq", SUPABASE_TRUE_VAL)
-            .execute()
-            .data
+        .select("*")
+        .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
+        .filter(IMPRESSION_TABLE_LIKED, "eq", SUPABASE_TRUE_VAL)
+        .execute()
+        .data
     )
     return impressions
 
