@@ -95,7 +95,7 @@ const TwitterLogin = ({ text, className, ...props }: React.ComponentProps<'butto
       onClick={() => {
         supabaseClient.auth.signInWithOAuth({
           provider: 'twitter',
-          options: { redirectTo: 'http://localhost:3000' }
+          options: { redirectTo: process.env.HOST }
         });
       }}
     >
