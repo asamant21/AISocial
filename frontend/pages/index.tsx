@@ -180,13 +180,14 @@ const LoginPage: NextPage = () => {
   return (
     <div className="w-full h-full bg-[#15202b] text-white">
       <button
+        className="bg-white hover:bg-gray-100 text-black font-medium py-2 px-4 rounded-full"
         onClick={async () => {
           await supabaseClient.auth.signOut();
           router.push('/');
         }}
       >
         Logout
-      </button>
+      </button> 
       <Feed />
     </div>
   );
