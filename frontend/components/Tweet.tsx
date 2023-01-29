@@ -16,7 +16,7 @@ const Tweet = ({ tweet }: Props) => {
     setLiked((curr) => !curr);
     console.log("toggle like");
     if (!liked) {
-      likeTweet().then(console.log);
+      likeTweet();
     }
   }, [liked, likeTweet]);
 
@@ -25,7 +25,6 @@ const Tweet = ({ tweet }: Props) => {
   }, [tweet]);
 
   const color = liked ? "#F91880" : "#71767B";
-  console.log({ color });
 
   return (
     <div className='p-4 cursor-pointer border-b border-zinc-700 hover:bg-gray-600 hover:bg-opacity-30 w-1/2'>
