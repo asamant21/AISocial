@@ -1,1 +1,1 @@
-export const BACKEND_URL = "http://gptwitter.fly.dev";
+export const BACKEND_URL = "https://gptwitter.fly.dev";
