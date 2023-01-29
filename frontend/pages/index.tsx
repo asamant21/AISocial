@@ -172,13 +172,6 @@ const LoginPage: NextPage = () => {
               height={500}
             />
           </Card>
-
-          <div className="mt-3 max-w-md font-normal tracking-wide mx-auto text-base text-gray-500">
-            {'"'}The magic happens in the latent space{'"'}
-          </div>
-          <div className="mt-3 max-w-md font-normal tracking-wide mx-auto text-base text-gray-500">
-            - Harrison W. Chase
-          </div>
         </div>
       </div>
     );
