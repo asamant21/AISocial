@@ -187,7 +187,7 @@ const LoginPage: NextPage = () => {
               <div className="mt-3 max-w-md font-normal tracking-wide mx-auto text-base" style={{color: "#808996", fontSize: "15px"}}>
                 <a href="https://twitter.com/hwchase17"> @hwchase17</a>
                 <a href="https://twitter.com/AkashSamant4">   @akashsamant4</a>
-                <a href="https://twitter.com/_seanyneutron">   @_seannyneutron</a>
+                <a href="https://twitter.com/_seanyneutron">   @_seanyneutron</a>
                 <a href="https://twitter.com/baga_tur">   @baga_tur</a>
               </div>
             </div>
