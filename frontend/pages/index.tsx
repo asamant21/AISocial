@@ -188,7 +188,9 @@ const LoginPage: NextPage = () => {
       >
         Logout
       </button>
+    <div className="h-2000vh overflow-hidden">
       <Feed />
+    </div>
   </div>
   );
 };
