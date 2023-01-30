@@ -154,7 +154,7 @@ const LoginPage: NextPage = () => {
             <TwitterLogin text="Login and Enter Your Bubble" />
           </div>
         </div>
-        <div className="flex flex-col items-center" margin-top= "10%">
+        <div className="flex flex-col items-center" style={{marginTop: 10}}>
           <Card>
             <Image
               className="opacity-60"
