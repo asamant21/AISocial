@@ -90,6 +90,7 @@ const TwitterLogin = ({ text }: { text: string }) => {
   )
 };
 
+
 const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const supabaseClient = useSupabaseClient();
   const router = useRouter();
@@ -150,7 +151,7 @@ const LoginPage: NextPage = () => {
             </div>
           </div>
           <div className="mt-4 max-w-md mx-auto flex flex-col items-center">
-            <TwitterLogin text="Login with Twitter" />
+            <TwitterLogin text="Login and Enter Your Bubble" />
           </div>
         </div>
         <div className="flex flex-col items-center">
@@ -163,6 +164,14 @@ const LoginPage: NextPage = () => {
               height={500}
             />
           </Card>
+        </div>
+        <div className="text-center pb-8">
+          <div className="mt-3 max-w-md font-normal tracking-wide mx-auto text-base" style={{color: "#808996", fontSize: "15px"}}>
+            <a href="https://twitter.com/hwchase17"> @hwchase17</a>
+            <a href="https://twitter.com/AkashSamant4">   @akashsamant4</a>
+            <a href="https://twitter.com/_seanyneutron">   @_seannyneutron</a>
+            <a href="https://twitter.com/baga_tur">   @baga_tur</a>
+          </div>
         </div>
       </div>
     );
