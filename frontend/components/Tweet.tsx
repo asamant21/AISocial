@@ -53,7 +53,7 @@ const Tweet = ({ tweet }: Props) => {
           </div>
         </div>
         <div>
-          <TwitterShareButton url={"https://gptwitter-neon.vercel.app/"} title={content + "\n-" + author.handle + "\n\nThis tweet was generate with GPTwitter."}> 
+          <TwitterShareButton url={"https://gptwitter-neon.vercel.app/"} title={content + "\n-" + author.handle + "\n\nThis tweet was generated with GPTwitter."}> 
             <TwitterIcon round size={30} />
           </TwitterShareButton>
         </div>
