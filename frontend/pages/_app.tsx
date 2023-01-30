@@ -12,9 +12,7 @@ function MyApp({
   Component,
   pageProps
 }: AppProps<{ initialSession: Session }>) {
-  const [supabaseClient] = useState(() =>
-    createBrowserSupabaseClient()
-  );
+  const [supabaseClient] = useState(() => createBrowserSupabaseClient());
 
   return (
     <SessionContextProvider

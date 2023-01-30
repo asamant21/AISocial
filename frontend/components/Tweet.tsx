@@ -16,7 +16,6 @@ const Tweet = ({ tweet }: Props) => {
   const handleToggleLike = useCallback(() => {
     // Optimistic update before we receive ground truth from backend.
     setLiked((curr) => !curr);
-    console.log("toggle like");
     if (!liked) {
       likeTweet();
     }

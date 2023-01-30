@@ -6,7 +6,6 @@ import {
 import { FaGithub } from "react-icons/fa";
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { Auth, ThemeSupa } from '@supabase/auth-ui-react';
 import type { NextPage } from 'next';
 import Feed from '@/components/Feed';
 import { useEffect, useState, useMemo } from 'react';
@@ -27,22 +26,14 @@ export const useClassNames = (fn: () => ClassInput[], deps: any[]) =>
 const Card = (
   {
     theme = 'primary',
-    disabled = false,
     children,
     className,
-    ...props
   }: React.ComponentProps<'div'> & {
     theme?: Theme;
-    disabled?: boolean;
   },
 ) => {
   const classNames = useClassNames(() => {
-    const base = `
-      border
-      rounded-md
-      overflow-hidden
-      ${themes.primary['bg-flipped']}
-    `;
+    const base = `border rounded-md overflow-hidden ${themes.primary['bg-flipped']}`;
 
     const themeClass = `
       ${themes[theme]['border']}
@@ -52,19 +43,13 @@ const Card = (
         ]
       }`;
 
-    const disabledClass = disabled
-      ? 'opacity-50 cursor-not-allowed select-none'
-      : '';
-
-    return [base, themeClass, disabledClass, className];
-  }, [theme, disabled, className]);
+    return [base, themeClass, className];
+  }, [theme, className]);
 
   return <div className={classNames}>{children}</div>
 }
 
-const TwitterLogin = ({ text, className, ...props }: React.ComponentProps<'button'> & { text: string }) => {
-  const supabaseClient = useSupabaseClient();
-
+const Button = ({ className, ...props }: React.ComponentProps<'button'>) => {
   const buttonStyle = `
     inline-flex items-center justify-center
     border border-transparent
@@ -79,47 +64,68 @@ const TwitterLogin = ({ text, className, ...props }: React.ComponentProps<'butto
     border-light-primary-bg
     dark:border-dark-primary-bg
     shadow
-
-    px-4
-    py-2
   `;
 
   const classNames = useClassNames(() => {
     return [buttonStyle, className];
   }, [buttonStyle, className])
 
+  return <button {...props} className={classNames} />;
+}
+
+const TwitterLogin = ({ text }: { text: string }) => {
+  const supabaseClient = useSupabaseClient();
   return (
-    <button
-      {...props}
-      className={classNames}
+    <Button
+      className="px-4 py-2"
       onClick={() => {
         supabaseClient.auth.signInWithOAuth({
           provider: 'twitter',
-          options: { redirectTo: process.env.HOST }
+          options: process.env.NODE_ENV === "development" ? { redirectTo: 'http://localhost:3000' } : {}
         });
       }}
     >
       {text}
-    </button>
+    </Button>
   )
 };
+
+const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+  const supabaseClient = useSupabaseClient();
+  const router = useRouter();
+  const titleColor = isLoggedIn ? 'text-white-500' : 'text-gray-700';
+
+  return (
+    <div className="max-w-7xl mx-auto py-4 px-4">
+      <nav className="relative flex items-center justify-between" aria-label="Global">
+          <div className="flex items-center flex-1">
+            <div className={`text-2xl font-semibold tracking-tight ${titleColor} cursor-default`}>GPTwitter</div>
+          </div>
+          <div className="flex flex-row items-center">
+            <a href="https://github.com/hwchase17/langchain" className="opacity-60 mr-4">
+              <FaGithub size={20} />
+            </a>
+            {!isLoggedIn ? <TwitterLogin text="Login" /> : (
+              <Button
+                className="px-4 py-2"
+                onClick={async () => {
+                  await supabaseClient.auth.signOut();
+                  router.push('/');
+                }}
+              >
+                Logout
+              </Button>
+            )}
+          </div>
+        </nav>
+    </div>
+  )
+}
 
 const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
   const user = useUser();
   const supabaseClient = useSupabaseClient();
-  const router = useRouter();
-
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    async function loadData() {
-      const { data } = await supabaseClient.from('users').select('*').single();
-      setData(data);
-    }
-
-    if (user) loadData();
-  }, [user, supabaseClient]);
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -131,24 +137,9 @@ const LoginPage: NextPage = () => {
   }, [user, supabaseClient]);
 
   if (!session) {
-    const NavBar = (
-      <div className="max-w-7xl mx-auto py-4">
-        <nav className="relative flex items-center justify-between" aria-label="Global">
-            <div className="flex items-center flex-1">
-              <div className="text-2xl font-semibold tracking-tight text-gray-700 cursor-default">GPTwitter</div>
-            </div>
-            <div className="flex flex-row items-center">
-              <a href="https://github.com/hwchase17/langchain" className="opacity-60 mr-4">
-                <FaGithub size={20} />
-              </a>
-              <TwitterLogin text="Login" />
-            </div>
-          </nav>
-      </div>
-    );
     return (
       <div className="w-screen h-screen">
-        {NavBar}
+        <Header isLoggedIn={Boolean(session)} />
         <div className="mt-8 pt-20 sm:pt-28 mx-auto max-w-7xl px-4 md:pb-12">
           <div className="text-center pb-8">
             <h1 className="max-w-4xl mx-auto text-4xl tracking-wide leading-8 font-normal text-gray-700">
@@ -178,19 +169,11 @@ const LoginPage: NextPage = () => {
   }
 
   return (
-    <div className="w-full h-full bg-[#15202b] text-white">
-      <button
-        className="bg-white opacity-75 hover:opacity-100 text-black font-medium text-xs py-1 px-2 rounded-full"
-        onClick={async () => {
-          await supabaseClient.auth.signOut();
-          router.push('/');
-        }}
-      >
-        Logout
-      </button>
-    <div className="h-2000vh overflow-hidden">
-      <Feed />
-    </div>
+    <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
+      <Header isLoggedIn={Boolean(session)} />
+      <div className="h-2000vh overflow-hidden">
+        <Feed />
+      </div>
   </div>
   );
 };
