@@ -25,12 +25,14 @@ const Feed = ({ tweets: tweetList }: Props) => {
       };
       setIsLoading(false);
       setTweets((curr) => [tweet, ...curr]);
-    })
+    }).catch(() => {
+      setIsLoading(false);
+    });
   }, [generateTweet]);
 
   return (
-    <div className="w-70 flex flex-col justify-center items-center">
-      <div className="flex flex-row h-10 items-center justify-center">
+    <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-row h-10 items-center justify-center mt-10 my-4">
         {isLoading ? (
           <Oval
             height={30}
@@ -49,7 +51,9 @@ const Feed = ({ tweets: tweetList }: Props) => {
         )}
       </div>
 
-      {tweets.map(tweet => <TweetItem key={tweet.id} tweet={tweet} />)}
+      <div className="w-[32rem] max-w-full">
+        {tweets.map(tweet => <TweetItem key={tweet.id} tweet={tweet} />)}
+      </div>
     </div>
   );
 }

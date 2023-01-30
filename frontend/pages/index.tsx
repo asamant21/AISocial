@@ -171,6 +171,7 @@ const LoginPage: NextPage = () => {
   return (
     <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
       <Header isLoggedIn={Boolean(session)} />
+
       <div className="h-2000vh overflow-hidden">
         <Feed />
       </div>
