@@ -29,7 +29,7 @@ const Tweet = ({ tweet }: Props) => {
   const color = liked ? "#F91880" : "#71767B";
 
   return (
-    <div className='p-4 cursor-pointer border-b border-zinc-700 hover:bg-gray-600 hover:bg-opacity-30 w-1/2 align-items: center'>
+    <div className='w-70 p-4 cursor-pointer border-b border-zinc-700 hover:bg-gray-600 hover:bg-opacity-30 w-1/2 justify-center align-items: center'>
       <div className='flex flex-row items-start justify-between space-x-3'>
         <div className='flex flex-col space-y-2 text-sm flex-3 items-start justify-stretch'>
           <div className='flex flex-col flex-1'>
