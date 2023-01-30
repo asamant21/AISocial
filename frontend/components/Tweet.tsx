@@ -43,7 +43,7 @@ const Tweet = ({ tweet }: Props) => {
             </p>
           </div>
         </div>
-        <div className='flex flex-col flex-1'>
+        <div className='flex flex-col flex-2'>
           <div className='flex items-center justify-between mt-1' onClick={handleToggleLike}>
             <div className={`text-[${color}] text-sm  flex items-center space-x-2 bg-transparent  hover:bg-slate-100 rounded-3xl hover:bg-opacity-10 p-2 hover:text-sky-400`}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeWidth={1.5} stroke={color} fill={liked ? color : "none"} className="w-6 h-6">
@@ -52,7 +52,7 @@ const Tweet = ({ tweet }: Props) => {
             </div>
           </div>
         </div>
-        <div className='flex flex-col flex-1'>
+        <div>
           <TwitterShareButton url={"https://gptwitter-neon.vercel.app/"} title={content + "\n-" + author.handle + "\n\nThis tweet was generated with GPTwitter."}> 
             <TwitterIcon round size={30} />
           </TwitterShareButton>
