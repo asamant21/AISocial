@@ -27,7 +27,7 @@ const Feed = ({ tweets: tweetList }: Props) => {
   }, [generateTweet]);
 
   return (
-    <div className="w-70 justify-center items-center flex flex-col">
+    <div className="w-70 flex flex-col justify-center items-center">
       <button className="rounded-full bg-cyan-500 py-2 px-4 hover:bg-cyan-700 my-4" onClick={handleGenerate}>Generate</button>
 
       {tweets.map(tweet => <TweetItem key={tweet.id} tweet={tweet} />)}
