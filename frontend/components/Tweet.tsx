@@ -54,7 +54,7 @@ const Tweet = ({ tweet }: Props) => {
         </div>
         <div className='flex flex-col flex-1'>
           <TwitterShareButton url={"https://gptwitter-neon.vercel.app/"} title={content + "\n-" + author.handle + "\n\nThis tweet was generated with GPTwitter."}> 
-            <TwitterIcon bgStyle={{color: "red"}} round size={30} />
+            <TwitterIcon round size={30} />
           </TwitterShareButton>
         </div>
       </div>
