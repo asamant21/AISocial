@@ -154,13 +154,12 @@ const LoginPage: NextPage = () => {
             <TwitterLogin text="Login and Enter Your Bubble" />
           </div>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" margin-top= "10%">
           <Card>
             <Image
               className="opacity-60"
               src="/bg.jpg" // Route of the image file
               alt="People floating in bubbles on their devices."
-              margin-top= "40px"
               width={500}
               height={500}
             />
