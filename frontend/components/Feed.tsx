@@ -72,7 +72,7 @@ const Feed = ({ tweets: tweetList }: Props) => {
       </div>
       {tweets.length > 0 ? 
         <div className="flex flex-row h-10 items-center justify-center">
-          <button className="hover:text-white" style={{color: "#808996", fontSize: "15px"}} onClick={handleRegenerate}>Reset</button>
+          <button className="px-4 hover:text-white" style={{color: "#808996", fontSize: "15px"}} onClick={handleRegenerate}>Reset</button>
         </div> : <></>
       }
       {isReset? 
