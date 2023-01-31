@@ -57,7 +57,7 @@ def generate_post(user_id: str, regen_time: datetime = datetime.min) -> dict:
         impressions = get_seed_impressions(user_id, regen_time)
 
     random_val = random.uniform(0, 1)
-    use_pregenerated = len(impressions) < 30 and random_val < 0.5
+    use_pregenerated = len(impressions) < 30 and random_val < 0.25
     if use_pregenerated:
         tweet = get_pregenerated_tweet()
         likes = get_tweet_likes(tweet[TWEET_TABLE_ID])
