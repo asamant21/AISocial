@@ -13,6 +13,7 @@ const Feed = ({ tweets: tweetList }: Props) => {
   const [isReset, setIsReset] = useState(false)
   const generateTweet = useRequestCallback('/generate');
   const regenerateTweet = useRequestCallback('/regenerate');
+  const [hover, setHover] = useState(false)
 
   const handleGenerate = useCallback(() => {
     setIsLoading(true);
@@ -72,7 +73,18 @@ const Feed = ({ tweets: tweetList }: Props) => {
       </div>
       {tweets.length > 0 ? 
         <div className="flex flex-row h-10 items-center justify-center">
-          <button className="px-4 hover:text-white" style={{color: "#808996", fontSize: "15px"}} onClick={handleRegenerate}>Reset</button>
+            <button 
+              className="px-4" 
+              style={{
+                color: hover ? "#C1C1C1" : "#808996", 
+                fontSize: "15px", 
+              }} 
+              onMouseEnter={() => setHover(true)} 
+              onMouseLeave={() => setHover(false)}
+              onClick={handleRegenerate}
+            >
+              Reset
+            </button>
         </div> : <></>
       }
       {isReset? 
