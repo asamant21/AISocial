@@ -2,7 +2,7 @@
 import json
 import random
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from fastapi import APIRouter, Depends
@@ -17,6 +17,7 @@ from app.api.db import (
     get_tweet_likes,
     get_user_impressions,
     seed_impressions,
+    get_random_insight
 )
 from app.api.endpoints.prompts import (
     day_quote,
@@ -24,6 +25,7 @@ from app.api.endpoints.prompts import (
     liked_prefix,
     liked_suffix,
     user_spec,
+    insight_style_chain
 )
 from app.config import key, url
 from app.constants import (
@@ -36,6 +38,7 @@ from app.constants import (
     TWEET_TABLE_ID,
     TWEET_TABLE_METADATA,
     TWEET_TABLE_NAME,
+    SUMMARY_TABLE_SYNTHESIS
 )
 
 router = APIRouter()
@@ -72,7 +75,13 @@ def generate_post(user_id: str, regen_time: datetime = datetime.min) -> dict:
     else:
         weights = compute_weights(impressions)
         chosen_impressions = choose_impressions(weights, impressions)
-        tweet = generate_tweet_from_impressions(chosen_impressions)
+
+        random_val = random.uniform(0, 1)
+        use_insights = random_val < 0
+        if use_insights:
+            tweet = generate_insight_tweet(chosen_impressions)
+        else:
+            tweet = generate_tweet_from_impressions(chosen_impressions)
         insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
         return {
             TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
@@ -124,6 +133,29 @@ def convert_impressions_to_examples(impressions: List[dict]) -> List[str]:
 def choose_impressions(weights: List[float], impressions: List[dict]) -> List[dict]:
     chosen_impressions = np.random.choice(impressions, size=2, replace=False, p=weights)
     return chosen_impressions
+
+
+def generate_insight_tweet(impressions: List[dict], user_num: str = "+14803523815") -> dict:
+    """Generate insight twee."""
+    insight = get_random_insight(user_num)
+    synthesis = insight[SUMMARY_TABLE_SYNTHESIS]
+    print(synthesis)
+    insights_dict = {"insights": synthesis, "style_samples": str(impressions)}
+    insight_transfer = insight_style_chain(insights_dict)["text"]
+
+    print(insight_transfer)
+    tweets = json.loads(insight_transfer)
+
+    impression_ids = [
+        impression[IMPRESSION_TABLE_TWEET_ID] for impression in impressions
+    ]
+
+    return_dict = {
+        TWEET_TABLE_CONTENT: tweets["tweet"],
+        TWEET_TABLE_AUTHOR: tweets["user_name"],
+        TWEET_TABLE_METADATA: {TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids},
+    }
+    return return_dict
 
 
 def generate_tweet_from_impressions(impressions: List[dict]) -> dict:

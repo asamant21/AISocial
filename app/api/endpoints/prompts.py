@@ -98,22 +98,29 @@ Insights:
 {insights}
 
 Style Example:
-{style_sample}
+{style_samples}
 
 Guidelines for writing tweet:
 - only use content from the insights above
 - be specific in the tweet that you do write
-- do not use content from the style example above
-- Use a style and tone that imitates the style example above
-- Use similar puns, idioms, jokes, and pop culture references as the tweets above
-- Write with a personality that imitates the style example above
+- do not use content from the style examples above
+- Use a style and tone that imitates the style examples above
+- Use similar puns, idioms, jokes, and pop culture references as the style examples above
+- Write with a personality that imitates the style examples above
+
+Output format (json): 
+{{
+    "tweet": the content of the tweet.
+    "user_name": @the user name of the tweeter
+}}.
 
 Output:
 """
 
-llm = ChatOpenAI(model_name="gpt-4", max_tokens=500)
+import os
+llm = ChatOpenAI(model_name="gpt-4", max_tokens=500, openai_api_key=os.environ["SECOND_KEY"])
 insight_tmpl = PromptTemplate(
-    input_variables=["insights", "style_sample"],
+    input_variables=["insights", "style_samples"],
     template=style_transfer_to_insight_prompt,
 )
 insight_style_chain = LLMChain(llm=llm, prompt=insight_tmpl, verbose=True)
