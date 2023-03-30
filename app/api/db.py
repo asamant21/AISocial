@@ -5,7 +5,7 @@ from typing import List
 
 import requests
 
-from app.config import key, supabase, url
+from app.config import key, supabase, url, second_client, second_key, second_url
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_CREATED_TIME,
@@ -18,6 +18,11 @@ from app.constants import (
     SUPABASE_TRUE_VAL,
     TWEET_TABLE_ID,
     TWEET_TABLE_NAME,
+    SUMMARY_TABLE_LINK,
+    SUMMARY_TABLE_MAIN_SUMMARY,
+    SUMMARY_TABLE_NAME,
+    SUMMARY_TABLE_NUM,
+    SUMMARY_TABLE_SYNTHESIS,
 )
 
 
@@ -182,3 +187,15 @@ def update_prompt_impression(impression: dict) -> None:
         .data
     )
     assert len(update_resp) > 0
+
+
+def get_random_insight(user_num: str) -> str:
+    """Get Summary insights."""
+    user_num = user_num.replace("+", "%2B")
+    token = f"Bearer {second_key}"
+    request_url = f"{second_url}/rest/v1/rpc/get_random_summary?number={user_num}"
+    res = requests.request(
+        "GET", request_url, headers={"Authorization": token, "apikey": second_key}
+    )
+    return res.json()[0]
+

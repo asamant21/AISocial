@@ -1,3 +1,5 @@
+from langchain.chat_models import ChatOpenAI
+from langchain import LLMChain
 from langchain.prompts import PromptTemplate
 
 #### GENERIC TWEET PROMPT PIECES
@@ -89,3 +91,29 @@ Guidelines for Creating Your Own Tweet:
 """
 
 non_liked_prompt = non_liked_prefix + tweet_json_format + non_liked_guidelines
+
+style_transfer_to_insight_prompt = """Write a tweet on the content of the following insights in the style of the example provide.
+
+Insights:
+{insights}
+
+Style Example:
+{style_sample}
+
+Guidelines for writing tweet:
+- only use content from the insights above
+- be specific in the tweet that you do write
+- do not use content from the style example above
+- Use a style and tone that imitates the style example above
+- Use similar puns, idioms, jokes, and pop culture references as the tweets above
+- Write with a personality that imitates the style example above
+
+Output:
+"""
+
+llm = ChatOpenAI(model_name="gpt-4", max_tokens=500)
+insight_tmpl = PromptTemplate(
+    input_variables=["insights", "style_sample"],
+    template=style_transfer_to_insight_prompt,
+)
+insight_style_chain = LLMChain(llm=llm, prompt=insight_tmpl, verbose=True)

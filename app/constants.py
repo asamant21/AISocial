@@ -15,6 +15,13 @@ IMPRESSION_TABLE_CREATED_TIME = "created_at"
 IMPRESSION_TABLE_LIKED = "liked"
 IMPRESSION_TABLE_CHILD_LIKE_COUNT = "child_like_count"
 
+SUMMARY_TABLE_NAME = "Summaries"
+SUMMARY_TABLE_NUM = "user_num"
+SUMMARY_TABLE_LINK = "link"
+SUMMARY_TABLE_MAIN_SUMMARY = "summary"
+SUMMARY_TABLE_PERSONA = "persona"
+SUMMARY_TABLE_SYNTHESIS = "synthesis"
+
 # Tweet table schema:
 # {'id': 6,
 #   'created_at': '2023-01-21T22:54:52.770345+00:00',
