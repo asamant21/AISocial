@@ -19,14 +19,17 @@ def get_current_user(authorization: str = Header(None)) -> str:
     id_token = authorization.replace("Bearer ", "")
     try:
         supabase_user = client.auth.api.get_user(jwt=id_token)
+        print(id_token)
         if supabase_user is not None:
             return str(supabase_user.id)
         else:
+            print("None found")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid token",
             )
     except Exception as e:
+        print("Some other error")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
