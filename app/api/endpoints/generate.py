@@ -131,18 +131,20 @@ def generate_tweet_from_impressions(impressions: List[dict]) -> dict:
     full_prefix = liked_prefix + day_prefix
     full_prompt = full_prefix + eg + liked_suffix + user_spec
 
-    from langchain.chat_models import ChatOpenAI
-    llm = ChatOpenAI(model_name="gpt-4", max_tokens=500)
+    curr_temp = 1.0
+    llm = OpenAI(temperature=curr_temp)
     loaded_dict = {}
 
     for i in range(3):
         try:
+            llm.temperature = curr_temp
             gen_tweet = llm(full_prompt)
             stripped_tweet = gen_tweet.strip(",\n")
             loaded_dict = json.loads(stripped_tweet)
             break
         except:
             # Lower the temperature, it could be getting the formatting wrong
+            curr_temp /= 2
             continue
 
     if len(loaded_dict) == 0:

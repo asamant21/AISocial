@@ -5,8 +5,9 @@ from datetime import datetime, timezone
 from dateutil import parser
 from fastapi import Header, HTTPException, status
 from gotrue import UserAttributes
+from gotrue.helpers import parse_user_response
 
-from app.config import supabase as client
+from app.config import supabase
 
 
 def get_current_user(authorization: str = Header(None)) -> str:
@@ -17,9 +18,9 @@ def get_current_user(authorization: str = Header(None)) -> str:
             detail="Authorization header missing",
         )
     id_token = authorization.replace("Bearer ", "")
+    print(id_token)
     try:
-        supabase_user = client.auth.api.get_user(jwt=id_token)
-        print(id_token)
+        supabase_user = supabase.auth.get_user(jwt=id_token).user
         if supabase_user is not None:
             return str(supabase_user.id)
         else:
@@ -29,6 +30,7 @@ def get_current_user(authorization: str = Header(None)) -> str:
                 detail="Invalid token",
             )
     except Exception as e:
+        print(e)
         print("Some other error")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -45,7 +47,7 @@ def get_regen_time(authorization: str = Header(None)) -> datetime:
         )
     id_token = authorization.replace("Bearer ", "")
     try:
-        supabase_user = client.auth.api.get_user(jwt=id_token)
+        supabase_user = supabase.auth.get_user(jwt=id_token).user
         if supabase_user is not None:
             user_metadata = supabase_user.user_metadata
             if "regeneration_time" in user_metadata:
@@ -79,10 +81,14 @@ def update_regen_time(authorization: str = Header(None)) -> datetime:
         user_update = UserAttributes(
             data={"regeneration_time": new_regen_time.isoformat()}
         )
-        supabase_user = client.auth.api.update_user(
-            jwt=id_token, attributes=user_update
+        update_response = supabase.auth._request(
+            "PUT",
+            "user",
+            body=user_update,
+            jwt=id_token,
+            xform=parse_user_response,
         )
-        if supabase_user is not None:
+        if update_response is not None:
             return new_regen_time
         else:
             raise HTTPException(
@@ -90,6 +96,7 @@ def update_regen_time(authorization: str = Header(None)) -> datetime:
                 detail="Invalid token",
             )
     except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
