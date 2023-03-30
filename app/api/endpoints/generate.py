@@ -7,6 +7,7 @@ from typing import List
 import numpy as np
 from fastapi import APIRouter, Depends
 from langchain.llms import OpenAI
+from supabase import Client, create_client
 
 from app.api import deps, schemas
 from app.api.db import (
@@ -24,7 +25,7 @@ from app.api.endpoints.prompts import (
     liked_suffix,
     user_spec,
 )
-from app.config import supabase
+from app.config import key, url
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_LIKED,
@@ -51,6 +52,7 @@ def generate(
 
 
 def generate_post(user_id: str, regen_time: datetime = datetime.min) -> dict:
+    supabase: Client = create_client(url, key)
     impressions = get_user_impressions(user_id, regen_time)
     if len(impressions) == 0:
         seed_impressions(user_id)

@@ -7,7 +7,8 @@ from fastapi import Header, HTTPException, status
 from gotrue import UserAttributes
 from gotrue.helpers import parse_user_response
 
-from app.config import supabase
+from app.config import key, url
+from supabase import Client, create_client
 
 
 def get_current_user(authorization: str = Header(None)) -> str:
@@ -19,6 +20,7 @@ def get_current_user(authorization: str = Header(None)) -> str:
         )
     id_token = authorization.replace("Bearer ", "")
     print(id_token)
+    supabase: Client = create_client(url, key)
     try:
         supabase_user = supabase.auth.get_user(jwt=id_token).user
         if supabase_user is not None:
@@ -46,6 +48,7 @@ def get_regen_time(authorization: str = Header(None)) -> datetime:
             detail="Authorization header missing",
         )
     id_token = authorization.replace("Bearer ", "")
+    supabase: Client = create_client(url, key)
     try:
         supabase_user = supabase.auth.get_user(jwt=id_token).user
         if supabase_user is not None:
@@ -76,6 +79,7 @@ def update_regen_time(authorization: str = Header(None)) -> datetime:
             detail="Authorization header missing",
         )
     id_token = authorization.replace("Bearer ", "")
+    supabase: Client = create_client(url, key)
     try:
         new_regen_time = datetime.now(timezone.utc)
         user_update = UserAttributes(

@@ -5,7 +5,8 @@ from typing import List
 
 import requests
 
-from app.config import key, supabase, url, second_client, second_key, second_url
+from app.config import key, url, second_url, second_key
+from supabase import Client, create_client
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_CREATED_TIME,
@@ -30,6 +31,7 @@ def get_seed_impressions(
     user_id: str, regen_time: datetime = datetime.min
 ) -> List[dict]:
     """Return all seed impressions."""
+    supabase: Client = create_client(url, key)
     impressions = (
         supabase.table("Impression")
         .select("*")
@@ -46,6 +48,7 @@ def get_user_impressions(
     user_id: str, regen_time: datetime = datetime.min
 ) -> List[dict]:
     """Return all the impressions for a user after a generation time."""
+    supabase: Client = create_client(url, key)
     impressions = (
         supabase.table("Impression")
         .select("*")
@@ -59,6 +62,7 @@ def get_user_impressions(
 
 def seed_impressions(user_id: str) -> None:
     """Add initial impressions for a new user."""
+    supabase: Client = create_client(url, key)
     tweets_to_use = random.sample(SEED_TWEET_IDS, k=20)
     for tweet_id in tweets_to_use:
         impression = {
@@ -74,6 +78,7 @@ def seed_impressions(user_id: str) -> None:
 
 def get_tweet(tweet_id: int) -> dict:
     """Retrieve tweet based on id."""
+    supabase: Client = create_client(url, key)
     tweet = (
         supabase.table(TWEET_TABLE_NAME)
         .select("*")
@@ -102,6 +107,7 @@ def get_user_liked_tweets(user_id: str) -> List[dict]:
 
 def get_user_like_impressions(user_id: str) -> List[dict]:
     """Get all direct like impressions for a user."""
+    supabase: Client = create_client(url, key)
     impressions = (
         supabase.table(IMPRESSION_TABLE_NAME)
         .select("*")
@@ -125,6 +131,7 @@ def get_pregenerated_tweet() -> dict:
 
 def get_tweet_likes(tweet_id: int) -> int:
     """Retrieve number of direct tweet likes."""
+    supabase: Client = create_client(url, key)
     likes = (
         supabase.table(IMPRESSION_TABLE_NAME)
         .select("*")
@@ -138,6 +145,7 @@ def get_tweet_likes(tweet_id: int) -> int:
 
 def add_direct_impression(tweet_id: int, user_id: str) -> None:
     """Add an impression of a direct tweet like."""
+    supabase: Client = create_client(url, key)
     direct_impression = {
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
         IMPRESSION_TABLE_USER_ID: user_id,
@@ -151,6 +159,7 @@ def add_direct_impression(tweet_id: int, user_id: str) -> None:
 
 def get_impression(tweet_id: int, user_id: str) -> dict:
     """Retrieve impression based on tweet and user id."""
+    supabase: Client = create_client(url, key)
     impression = (
         supabase.table(IMPRESSION_TABLE_NAME)
         .select("*")
@@ -164,6 +173,7 @@ def get_impression(tweet_id: int, user_id: str) -> dict:
 
 def add_prompt_impression(tweet_id: int, user_id: str) -> None:
     """Add impression for a prompt tweet after a derived tweet was liked."""
+    supabase: Client = create_client(url, key)
     impression = {
         IMPRESSION_TABLE_USER_ID: user_id,
         IMPRESSION_TABLE_TWEET_ID: tweet_id,
@@ -177,6 +187,7 @@ def add_prompt_impression(tweet_id: int, user_id: str) -> None:
 
 def update_prompt_impression(impression: dict) -> None:
     """Update existing impression for a prompt tweet after a derived tweet was liked."""
+    supabase: Client = create_client(url, key)
     count = impression[IMPRESSION_TABLE_CHILD_LIKE_COUNT]
     impression_id = impression[IMPRESSION_TABLE_ID]
     update_resp = (
