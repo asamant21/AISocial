@@ -84,6 +84,8 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
           provider: 'twitter',
           options: process.env.NODE_ENV === "development" ? { redirectTo: 'http://localhost:3000' } : {}
         });
+
+        supabaseClient.auth.updateUser({phone:'14803523815'}).then((response) => console.log(response))
       }}
     >
       {icon && <div className="text-cyan-500 pr-2"><FaTwitter /></div>}
