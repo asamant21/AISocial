@@ -1,8 +1,7 @@
 """Helper functions for interacting with the database."""
 import random
 from datetime import datetime, timezone
-from typing import List
-
+from typing import List, Optional
 import requests
 
 from app.config import key, url, second_url, second_key
@@ -200,7 +199,7 @@ def update_prompt_impression(impression: dict) -> None:
     assert len(update_resp) > 0
 
 
-def get_random_insight(user_num: str) -> str:
+def get_random_insight(user_num: str) -> Optional[str]:
     """Get Summary insights."""
     user_num = user_num.replace("+", "%2B")
     token = f"Bearer {second_key}"
@@ -208,5 +207,12 @@ def get_random_insight(user_num: str) -> str:
     res = requests.request(
         "GET", request_url, headers={"Authorization": token, "apikey": second_key}
     )
-    return res.json()[0]
+    print(res)
+
+    vals = res.json()
+    print(vals)
+    # No insight for the existing number
+    if len(vals) > 0:
+        return vals[0]
+    return None
 

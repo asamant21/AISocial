@@ -28,6 +28,7 @@ from app.api.endpoints.prompts import (
     insight_style_chain
 )
 from app.config import key, url
+from gotrue.types import User
 from app.constants import (
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_LIKED,
@@ -46,7 +47,7 @@ router = APIRouter()
 
 @router.get("", response_model=schemas.Tweet)
 def generate(
-    current_user: str = Depends(deps.get_current_user),
+    current_user: User = Depends(deps.get_current_user),
     regen_time: datetime = Depends(deps.get_regen_time),
 ):
     """Generate a tweet for the user."""
@@ -54,7 +55,11 @@ def generate(
     return generate_post(current_user, regen_time)
 
 
-def generate_post(user_id: str, regen_time: datetime = datetime.min) -> dict:
+def generate_post(current_user: User, regen_time: datetime = datetime.min) -> dict:
+    user_id = str(current_user.id)
+    user_num = current_user.user_metadata.get("phone", "")
+    print(f"User number: {user_num}")
+
     supabase: Client = create_client(url, key)
     impressions = get_user_impressions(user_id, regen_time)
     if len(impressions) == 0:
@@ -77,10 +82,14 @@ def generate_post(user_id: str, regen_time: datetime = datetime.min) -> dict:
         chosen_impressions = choose_impressions(weights, impressions)
 
         random_val = random.uniform(0, 1)
-        use_insights = random_val < 0
+        use_insights = random_val < 1
+        tweet = None
         if use_insights:
-            tweet = generate_insight_tweet(chosen_impressions)
-        else:
+            tweet = generate_insight_tweet(chosen_impressions, user_num)
+
+        # If no insights generated from insight tweet, or use_insights not
+        # used, then generate a regular tweet
+        if tweet is None:
             tweet = generate_tweet_from_impressions(chosen_impressions)
         insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
         return {
@@ -135,9 +144,14 @@ def choose_impressions(weights: List[float], impressions: List[dict]) -> List[di
     return chosen_impressions
 
 
-def generate_insight_tweet(impressions: List[dict], user_num: str = "+14803523815") -> dict:
+def generate_insight_tweet(impressions: List[dict], user_num: str = "") -> Optional[dict]:
     """Generate insight twee."""
     insight = get_random_insight(user_num)
+
+    # If no insight exist for the current number
+    if insight is None:
+        return None
+
     synthesis = insight[SUMMARY_TABLE_SYNTHESIS]
     print(synthesis)
     insights_dict = {"insights": synthesis, "style_samples": str(impressions)}
