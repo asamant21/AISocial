@@ -216,9 +216,10 @@ const LoginPage: NextPage = () => {
         {/* <Feed /> */}
         <PhoneInput
           placeholder="Enter phone number"
+          defaultCountry={"US"}
           value={value}
           onChange={setValue}
-          style={{ color: 'black', '--input-color': 'white' }}
+          style={{ color: 'black' }}
         />
         <button onClick={updateUserNumber}>Update Number</button>
       </div>
