@@ -34,6 +34,13 @@ TWEET_TABLE_AUTHOR = "author"
 TWEET_TABLE_CONTENT = "content"
 TWEET_TABLE_METADATA = "metadata"
 TWEET_METADATA_PROMPT_TWEET_IDS = "prompt_example_tweet_ids"
+TWEET_METADATA_ORIGIN_USER_NUM = "origin_user_num"
+TWEET_METADATA_ORIGIN_USER_NAME = "origin_user_name"
+
+FRIEND_TABLE_NAME = "Friends"
+FRIEND_TABLE_USER_NUM = "user_num"
+FRIEND_TABLE_FRIEND_NUM = "friend_num"
+FRIEND_TABLE_ACCEPTED = "accepted"
 
 SUPABASE_TRUE_VAL = "true"
 SUPABASE_FALSE_VAL = "false"

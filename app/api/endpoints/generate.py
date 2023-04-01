@@ -17,7 +17,7 @@ from app.api.db import (
     get_tweet_likes,
     get_user_impressions,
     seed_impressions,
-    get_random_insight
+    get_mashed_feed_insight
 )
 from app.api.endpoints.prompts import (
     day_quote,
@@ -39,7 +39,8 @@ from app.constants import (
     TWEET_TABLE_ID,
     TWEET_TABLE_METADATA,
     TWEET_TABLE_NAME,
-    SUMMARY_TABLE_SYNTHESIS
+    SUMMARY_TABLE_SYNTHESIS,
+    TWEET_METADATA_ORIGIN_USER_NUM
 )
 
 router = APIRouter()
@@ -75,6 +76,7 @@ def generate_post(current_user: User, regen_time: datetime = datetime.min) -> di
             "id": tweet[TWEET_TABLE_ID],
             "author": tweet[TWEET_TABLE_AUTHOR],
             "content": tweet[TWEET_TABLE_CONTENT],
+            "metadata": tweet[TWEET_TABLE_METADATA],
             "likes": likes,
         }
     else:
@@ -96,6 +98,7 @@ def generate_post(current_user: User, regen_time: datetime = datetime.min) -> di
             TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
             TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
             TWEET_TABLE_CONTENT: insert_resp[TWEET_TABLE_CONTENT],
+            TWEET_TABLE_METADATA: insert_resp[TWEET_TABLE_METADATA],
             "likes": 0,
         }
 
@@ -146,8 +149,7 @@ def choose_impressions(weights: List[float], impressions: List[dict]) -> List[di
 
 def generate_insight_tweet(impressions: List[dict], user_num: str = "") -> Optional[dict]:
     """Generate insight twee."""
-    insight = get_random_insight(user_num)
-
+    num_used, insight = get_mashed_feed_insight(user_num)
     # If no insight exist for the current number
     if insight is None:
         return None
@@ -164,10 +166,16 @@ def generate_insight_tweet(impressions: List[dict], user_num: str = "") -> Optio
         impression[IMPRESSION_TABLE_TWEET_ID] for impression in impressions
     ]
 
+    tweet_metadata = {
+        TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids,
+    }
+    if num_used != user_num:
+        tweet_metadata[TWEET_METADATA_ORIGIN_USER_NUM] = num_used
+
     return_dict = {
         TWEET_TABLE_CONTENT: tweets["tweet"],
         TWEET_TABLE_AUTHOR: tweets["user_name"],
-        TWEET_TABLE_METADATA: {TWEET_METADATA_PROMPT_TWEET_IDS: impression_ids},
+        TWEET_TABLE_METADATA: tweet_metadata,
     }
     return return_dict
 

@@ -1,7 +1,7 @@
 """Helper functions for interacting with the database."""
 import random
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import requests
 
 from app.config import key, url, second_url, second_key
@@ -18,11 +18,9 @@ from app.constants import (
     SUPABASE_TRUE_VAL,
     TWEET_TABLE_ID,
     TWEET_TABLE_NAME,
-    SUMMARY_TABLE_LINK,
-    SUMMARY_TABLE_MAIN_SUMMARY,
-    SUMMARY_TABLE_NAME,
-    SUMMARY_TABLE_NUM,
-    SUMMARY_TABLE_SYNTHESIS,
+    FRIEND_TABLE_FRIEND_NUM,
+    FRIEND_TABLE_NAME,
+    FRIEND_TABLE_USER_NUM,
 )
 
 
@@ -199,15 +197,46 @@ def update_prompt_impression(impression: dict) -> None:
     assert len(update_resp) > 0
 
 
+def get_all_friends(user_num: str) -> List[dict]:
+    """Get all friends of a user."""
+    supabase: Client = create_client(second_url, second_key)
+    friends = (
+        supabase.table(FRIEND_TABLE_NAME)
+        .select("*")
+        .filter(FRIEND_TABLE_USER_NUM, "eq", user_num)
+        .execute()
+        .data
+    )
+    return friends
+
+
+def get_mashed_feed_insight(user_num: str) -> Tuple[str, Optional[str]]:
+    """Get an insight from you or one of your friends.
+
+    First choose a random insight from either you or your friend. If nothing
+    comes from your friend, choose one for you.
+    """
+    friends = get_all_friends(user_num)
+    friend_nums = [friend[FRIEND_TABLE_FRIEND_NUM] for friend in friends]
+    all_nums = friend_nums + [user_num]
+
+    num_to_use = random.choice(all_nums)
+    insight = get_random_insight(num_to_use)
+
+    if num_to_use != user_num and insight is None:
+        return user_num, get_random_insight(user_num)
+
+    return num_to_use, insight
+
+
 def get_random_insight(user_num: str) -> Optional[str]:
-    """Get Summary insights."""
+    """Get random insight from user num provided."""
     user_num = user_num.replace("+", "%2B")
     token = f"Bearer {second_key}"
     request_url = f"{second_url}/rest/v1/rpc/get_random_summary?number={user_num}"
     res = requests.request(
         "GET", request_url, headers={"Authorization": token, "apikey": second_key}
     )
-    print(res)
 
     vals = res.json()
     print(vals)
