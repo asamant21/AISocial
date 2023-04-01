@@ -36,11 +36,17 @@ const Tweet = ({ tweet }: Props) => {
   }, [tweet]);
 
   const color = liked ? "#F91880" : "#71767B";
+  const noUserNum = (tweet.metadata == null) || !("origin_user_num" in tweet.metadata)
 
   return (
     <div className='p-4 cursor-pointer border-b border-zinc-700 hover:bg-gray-600 hover:bg-opacity-30 w-full align-center'>
       <div className='flex flex-row items-center justify-between space-x-3'>
         <div className='flex flex-col'>
+          {!noUserNum &&
+            <p className='text-xs sm:text-sm font-light text-gray-400 hover:underline pb-2'>
+              <b>Insight From: Matthew Fastow</b>
+            </p>
+          }
           <p className='text-xs sm:text-sm font-light hover:underline pb-2'>
             <b>{author.handle}</b>
           </p>

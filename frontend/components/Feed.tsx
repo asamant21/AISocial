@@ -18,9 +18,11 @@ const Feed = ({ tweets: tweetList }: Props) => {
   const handleGenerate = useCallback(() => {
     setIsLoading(true);
     generateTweet().then(res => {
-      const { author, content, id } = res as { author: string, content: string, id: number };
+      console.log(res)
+      const { author, content, id, metadata } = res as { author: string, content: string, id: number, metadata: Object };
       const tweet =  {
         author: { handle: author },
+        metadata,
         content,
         id,
         likes: 0,
@@ -36,9 +38,10 @@ const Feed = ({ tweets: tweetList }: Props) => {
   const handleRegenerate = useCallback(() => {
     setIsReset(true);
     regenerateTweet().then(res => {
-      const { author, content, id } = res as { author: string, content: string, id: number };
+      const { author, content, id, metadata } = res as { author: string, content: string, id: number, metadata: Object };
       const tweet =  {
         author: { handle: author },
+        metadata,
         content,
         id,
         likes: 0,

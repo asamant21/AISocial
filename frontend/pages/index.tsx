@@ -96,6 +96,7 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
 const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const supabaseClient = useSupabaseClient();
   const router = useRouter();
+  supabaseClient.auth.getSession().then((res) => console.log(res))
   const titleColor = isLoggedIn ? 'text-white-500' : 'text-gray-700';
 
   return (
