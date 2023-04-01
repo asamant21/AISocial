@@ -40,6 +40,61 @@ def get_current_user(authorization: str = Header(None)) -> str:
         )
 
 
+def get_current_user_jwt(authorization: str = Header(None)) -> str:
+    """Return jwt token for current user."""
+    if authorization is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header missing",
+        )
+    id_token = authorization.replace("Bearer ", "")
+    supabase: Client = create_client(url, key)
+    try:
+        supabase_user = supabase.auth.get_user(jwt=id_token).user
+        if supabase_user is not None:
+            return id_token
+        else:
+            print("None found")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+            )
+    except Exception as e:
+        print(e)
+        print("Some other error")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+
+
+def update_user_phone_number(id_token: str, number: str) -> None:
+    """Update phone number for current use."""
+    supabase: Client = create_client(url, key)
+    try:
+        user_update = UserAttributes(
+            phone=number
+        )
+        update_response = supabase.auth._request(
+            "PUT",
+            "user",
+            body=user_update,
+            jwt=id_token,
+            xform=parse_user_response,
+        )
+        if update_response is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+            )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
+
+
 def get_regen_time(authorization: str = Header(None)) -> datetime:
     """Get the last regeneration time of a user to query."""
     if authorization is None:
