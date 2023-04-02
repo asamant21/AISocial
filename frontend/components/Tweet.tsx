@@ -44,7 +44,7 @@ const Tweet = ({ tweet }: Props) => {
         <div className='flex flex-col'>
           {!noUserNum &&
             <p className='text-xs sm:text-sm font-light text-gray-400 hover:underline pb-2'>
-              <b>Insight From: Matt</b>
+              <b>Insight From: {tweet.metadata["origin_user_num"]}</b>
             </p>
           }
           <p className='text-xs sm:text-sm font-light hover:underline pb-2'>
