@@ -219,6 +219,7 @@ def get_mashed_feed_insight(user_num: str) -> Tuple[str, Optional[str]]:
     friends = get_all_friends(user_num)
     friend_nums = [friend[FRIEND_TABLE_FRIEND_NUM] for friend in friends]
     all_nums = friend_nums + [user_num]
+    print(all_nums)
 
     num_to_use = random.choice(all_nums)
     insight = get_random_insight(num_to_use)

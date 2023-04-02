@@ -5,6 +5,7 @@ class Tweet(BaseModel):
     id: int
     content: str
     author: str
+    metadata: dict
     likes: int
 
 

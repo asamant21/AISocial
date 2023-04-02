@@ -88,12 +88,14 @@ def generate_post(current_user: User, regen_time: datetime = datetime.min) -> di
         tweet = None
         if use_insights:
             tweet = generate_insight_tweet(chosen_impressions, user_num)
+            print(tweet)
 
         # If no insights generated from insight tweet, or use_insights not
         # used, then generate a regular tweet
         if tweet is None:
             tweet = generate_tweet_from_impressions(chosen_impressions)
         insert_resp = supabase.table(TWEET_TABLE_NAME).insert(tweet).execute().data[0]
+        print(insert_resp)
         return {
             TWEET_TABLE_ID: insert_resp[TWEET_TABLE_ID],
             TWEET_TABLE_AUTHOR: insert_resp[TWEET_TABLE_AUTHOR],
@@ -150,6 +152,7 @@ def choose_impressions(weights: List[float], impressions: List[dict]) -> List[di
 def generate_insight_tweet(impressions: List[dict], user_num: str = "") -> Optional[dict]:
     """Generate insight twee."""
     num_used, insight = get_mashed_feed_insight(user_num)
+    print(num_used)
     # If no insight exist for the current number
     if insight is None:
         return None
