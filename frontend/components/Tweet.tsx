@@ -37,6 +37,7 @@ const Tweet = ({ tweet }: Props) => {
 
   const color = liked ? "#F91880" : "#71767B";
   const noUserNum = (tweet.metadata == null) || !("origin_user_num" in tweet.metadata)
+  const metadata = new Map(Object.entries(tweet.metadata));
 
   return (
     <div className='p-4 cursor-pointer border-b border-zinc-700 hover:bg-gray-600 hover:bg-opacity-30 w-full align-center'>
@@ -44,7 +45,7 @@ const Tweet = ({ tweet }: Props) => {
         <div className='flex flex-col'>
           {!noUserNum &&
             <p className='text-xs sm:text-sm font-light text-gray-400 hover:underline pb-2'>
-              <b>Insight From: {tweet.metadata["origin_user_num"]}</b>
+              <b>Insight From: {String(metadata.get("origin_user_num"))}</b>
             </p>
           }
           <p className='text-xs sm:text-sm font-light hover:underline pb-2'>
