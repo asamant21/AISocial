@@ -18,5 +18,3 @@ def regenerate(
     """Regenerate a tweet for the user."""
     print(current_user)
     return generate_post(current_user, regen_time)
-
-
