@@ -1,9 +1,10 @@
+
+import React, { useState, useCallback, useEffect } from "react";
 import {
   useSessionContext,
   useSupabaseClient,
   useUser
 } from '@supabase/auth-helpers-react';
-import React, { useState, useCallback, useEffect } from "react";
 import TweetItem from "./Tweet";
 import { Tweet } from "@/lib/types";
 import { useRequestCallback } from "@/lib/api";
@@ -32,6 +33,8 @@ const Feed = ({ tweets: tweetList }: Props) => {
       changeStyle();
     }
   }, [changeStyle])
+
+  supabaseClient.auth.getSession().then((res) => console.log(res))
 
   const handleGenerate = useCallback(() => {
     setIsLoading(true);

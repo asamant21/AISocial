@@ -13,6 +13,9 @@ import { Oval } from "react-loader-spinner";
 import { themes } from '../utils/styles';
 import { twMerge } from 'tailwind-merge';
 
+import PhoneInput from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
+
 export type Theme =
   | 'primary'
   | 'secondary';
@@ -83,7 +86,7 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
         supabaseClient.auth.signInWithOAuth({
           provider: 'twitter',
           options: process.env.NODE_ENV === "development" ? { redirectTo: 'http://localhost:3000' } : {}
-        }).then((response) => supabaseClient.auth.updateUser({phone:'14803523815'}).then((response) => console.log(response)))
+        });
       }}
     >
       {icon && <div className="text-cyan-500 pr-2"><FaTwitter /></div>}
@@ -95,6 +98,8 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
 
 const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const supabaseClient = useSupabaseClient();
+  // supabaseClient.auth.getSession().then((response) => console.log(response))
+  // supabaseClient.auth.updateUser({data: {"phone": 'hiyahiyahiya'}}).then((response) => console.log(response))
   const router = useRouter();
   supabaseClient.auth.getSession().then((res) => console.log(res))
   const titleColor = isLoggedIn ? 'text-white-500' : 'text-gray-700';
@@ -127,6 +132,7 @@ const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
   const user = useUser();
   const supabaseClient = useSupabaseClient();
+  const [value, setValue] = useState()
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -188,12 +194,24 @@ const LoginPage: NextPage = () => {
     );
   }
 
+  const updateUserNumber = () => {
+    supabaseClient.auth.updateUser({data: {"phone": value}}).then((res) => console.log(res))
+  }
+
   return (
     <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
       <Header isLoggedIn={Boolean(session)} />
 
       <div className="h-2000vh overflow-hidden">
-        <Feed />
+        {/* <Feed /> */}
+        <PhoneInput
+          placeholder="Enter phone number"
+          defaultCountry={"US"}
+          value={value}
+          onChange={setValue}
+          style={{ color: 'black' }}
+        />
+        <button onClick={updateUserNumber}>Update Number</button>
       </div>
   </div>
   );
