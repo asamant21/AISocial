@@ -4,6 +4,7 @@ import {
   useUser,
   User
 } from '@supabase/auth-helpers-react';
+import {client} from '@/lib/supabase'
 import { FaGithub, FaSourcetree, FaTwitter } from "react-icons/fa";
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -18,6 +19,7 @@ import { Center, Button, TextInput, Select, Stack, Space, Text, Title } from "@m
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { List } from 'postcss/lib/list';
+import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 
 export type Theme =
   | 'primary'
@@ -130,20 +132,25 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   )
 }
 
+
 const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
-  var user = useUser();
+  const supabaseClient = useSupabaseClient();
+  var user = useUser()
   const router = useRouter();
   console.log(user)
-  const supabaseClient = useSupabaseClient();
   const [number, setNumber] = useState("");
   const [style, setStyle] = useState("");
+  const [hasPhoneNumber, setHasEntered] = useState(false)
+
+  console.log("PHONE NUMBER")
+  console.log(hasPhoneNumber)
 
 
   useEffect(() => {
     const timeout = setInterval(() => {
       supabaseClient.auth.refreshSession()
-    }, 5 * 60 * 1000);
+    }, 500);
     return () => {
       clearInterval(timeout);
     }
@@ -200,16 +207,13 @@ const LoginPage: NextPage = () => {
     );
   }
 
-  const reassignUser = (res: User | null) => {
+  const reassignUser = async (res: User | null) => {
     if (res == null) {
       return
     }
 
-    console.log("RES")
-    console.log(res)
     user = res
-    console.log("USER")
-    console.log(res)
+    setHasEntered(true)
   }
 
   const updateUserInfo = () => {
@@ -222,7 +226,7 @@ const LoginPage: NextPage = () => {
     }
     console.log(phone_number)
     supabaseClient.auth.updateUser(
-      {data: {"why": "val2"}}).then((res) => reassignUser(res.data.user)).then(() => router.push("/"))
+      {data: {"phone": phone_number, "style": style}}).then((res) => reassignUser(res.data.user)).then(() => router.push("/"))
   }
 
   const setVals = (value: String | null) => {
@@ -233,104 +237,52 @@ const LoginPage: NextPage = () => {
      setStyle(strValue)
   }
 
-  console.log("Value Again")
+  console.log("USER")
   console.log(user)
 
-  const processInfo = (data: any[] | null) => {
-    console.log(data)
-    if (data == null || data.length == 0) {
-      return (
-        <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
-          <Header isLoggedIn={Boolean(session)} />
-    
-          <Center>
-            <Stack>
-              <Title>Enter a little information below to get started.</Title>
-              <TextInput
-                label={<Text color="white">Phone Number</Text>}
-                placeholder="+10000000000"
-                value={number}
-                onChange={(event) => setNumber(event.currentTarget.value)}
-              />
-              <Space h="md"/>
-              <Select
-                label={<Text color="white">Preferred style</Text>}
-                placeholder="Pick one"
-                onChange={(value) => setVals(value)}
-                data={[
-                  { value: "classic", label: "Classic Twitter" },
-                  { value: "informative", label: "Informative" },
-                  { value: "questions", label: "Thought-provoking Questions" },
-                ]
-              }
-              />
-              <Space h="md"/>
-              <Button variant="white" compact color="gray" size="xl" onClick={updateUserInfo}>Enter Feed</Button>
-            </Stack>
-          </Center>
-      </div>
-      );
-    }
 
+  if ((user?.user_metadata["phone"] == null || user?.user_metadata["phone"] == "") && !(hasPhoneNumber)) {
     return (
       <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
         <Header isLoggedIn={Boolean(session)} />
   
-        <div className="h-2000vh overflow-hidden">
-          <Feed />
-        </div>
+        <Center>
+          <Stack>
+            <Title>Enter a little information below to get started.</Title>
+            <TextInput
+              label={<Text color="white">Phone Number</Text>}
+              placeholder="+10000000000"
+              value={number}
+              onChange={(event) => setNumber(event.currentTarget.value)}
+            />
+            <Space h="md"/>
+            <Select
+              label={<Text color="white">Preferred style</Text>}
+              placeholder="Pick one"
+              onChange={(value) => setVals(value)}
+              data={[
+                { value: "classic", label: "Classic Twitter" },
+                { value: "informative", label: "Informative" },
+                { value: "questions", label: "Thought-provoking Questions" },
+              ]
+            }
+            />
+            <Space h="md"/>
+            <Button variant="white" compact color="gray" size="xl" onClick={updateUserInfo}>Enter Feed</Button>
+          </Stack>
+        </Center>
     </div>
     );
   }
+  return (
+    <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
+      <Header isLoggedIn={Boolean(session)} />
 
-  const FinalNextPage = () => (NextPage) {
-    supabaseClient.from('UserGenerateInfo').select().eq("user_id", user?.id).then((data) => {return processInfo(data.data)})
-  }
-  const NextPage =  FinalNextPage()
-  return NextPage
-  // if (user?.user_metadata["why"] == "val") {
-  //   return (
-  //     <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
-  //       <Header isLoggedIn={Boolean(session)} />
-  
-  //       <Center>
-  //         <Stack>
-  //           <Title>Enter a little information below to get started.</Title>
-  //           <TextInput
-  //             label={<Text color="white">Phone Number</Text>}
-  //             placeholder="+10000000000"
-  //             value={number}
-  //             onChange={(event) => setNumber(event.currentTarget.value)}
-  //           />
-  //           <Space h="md"/>
-  //           <Select
-  //             label={<Text color="white">Preferred style</Text>}
-  //             placeholder="Pick one"
-  //             onChange={(value) => setVals(value)}
-  //             data={[
-  //               { value: "classic", label: "Classic Twitter" },
-  //               { value: "informative", label: "Informative" },
-  //               { value: "questions", label: "Thought-provoking Questions" },
-  //             ]
-  //           }
-  //           />
-  //           <Space h="md"/>
-  //           <Button variant="white" compact color="gray" size="xl" onClick={updateUserInfo}>Enter Feed</Button>
-  //         </Stack>
-  //       </Center>
-  //   </div>
-  //   );
-  // }
-
-  // return (
-  //   <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
-  //     <Header isLoggedIn={Boolean(session)} />
-
-  //     <div className="h-2000vh overflow-hidden">
-  //       <Feed />
-  //     </div>
-  // </div>
-  // );
+      <div className="h-2000vh overflow-hidden">
+        <Feed />
+      </div>
+  </div>
+  );
 };
 
 export default LoginPage;
