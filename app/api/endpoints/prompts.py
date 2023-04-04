@@ -92,12 +92,12 @@ Guidelines for Creating Your Own Tweet:
 
 non_liked_prompt = non_liked_prefix + tweet_json_format + non_liked_guidelines
 
-style_transfer_to_insight_prompt = """Write a tweet on the content of the following insights in the style of the example provide.
+style_transfer_to_insight_prompt = """Write a tweet on the content of the following insights in the style of the examples provide.
 
 Insights:
 {insights}
 
-Style Example:
+Style Examples:
 {style_samples}
 
 Guidelines for writing tweet:
@@ -127,12 +127,12 @@ insight_tmpl = PromptTemplate(
 )
 insight_style_chain = LLMChain(llm=llm, prompt=insight_tmpl, verbose=True)
 
-insightful_comment_prompt = """Write a tweet phrased as a deep, insightful comment on the content of the following insights in the style of the example provide.
+insightful_comment_prompt = """Write a tweet phrased as a deep, insightful comment on the content of the following insights in the style of the examples provide.
 
 Insights:
 {insights}
 
-Style Example:
+Style Examples:
 {style_samples}
 
 Guidelines for writing tweet:
@@ -161,12 +161,12 @@ insightful_comment_tmpl = PromptTemplate(
 insightful_comment_chain = LLMChain(llm=llm, prompt=insightful_comment_tmpl, verbose=True)
 
 
-better_question_prompt = """Write a tweet phrased as an insightful question on the content of the following insights in the style of the example provide.
+better_question_prompt = """Write a tweet phrased as an insightful question on the content of the following insights in the style of the examples provide.
 
 Insights:
 {insights}
 
-Style Example:
+Style Examples:
 {style_samples}
 
 Guidelines for writing tweet:

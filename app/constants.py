@@ -45,9 +45,9 @@ FRIEND_TABLE_ACCEPTED = "accepted"
 SUPABASE_TRUE_VAL = "true"
 SUPABASE_FALSE_VAL = "false"
 
-DEFAULT_STYLE = "default"
-INSIGHTFUL_STYLE = "insightful"
-QUESTION_STYLE = "interesting_question"
+DEFAULT_STYLE = "classic"
+INSIGHTFUL_STYLE = "informative"
+QUESTION_STYLE = "questions"
 
 SEED_TWEET_IDS = [
     260,
