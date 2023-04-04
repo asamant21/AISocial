@@ -18,14 +18,20 @@ const Feed = ({ tweets: tweetList }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [style, setStyle] = useState('classic');
+  const [changeStyle, setChangeStyle] = useState<() => Promise<any>>();
   const generateTweet = useRequestCallback('/generate');
   const regenerateTweet = useRequestCallback('/regenerate');
-  const changeStyle = useRequestCallback('/changeStyle');
   const [hover, setHover] = useState(false)
 
   useEffect(() => {
-    changeStyle(style);
+    setChangeStyle(useRequestCallback(`/changeStyle/${style}`));
   }, [style])
+
+  useEffect(() => {
+    if (changeStyle) {
+      changeStyle();
+    }
+  }, [changeStyle])
 
   const handleGenerate = useCallback(() => {
     setIsLoading(true);
