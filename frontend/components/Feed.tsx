@@ -25,7 +25,7 @@ const Feed = ({ tweets: tweetList }: Props) => {
   const [hover, setHover] = useState(false)
 
   useEffect(() => {
-    setChangeStyle(useRequestCallback(`/changeStyle/${style}`));
+    setChangeStyle(useRequestCallback('/changeStyle/${style}'));
   }, [style])
 
   useEffect(() => {

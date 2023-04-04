@@ -100,7 +100,6 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
 const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const supabaseClient = useSupabaseClient();
   // supabaseClient.auth.getSession().then((response) => console.log(response))
-  // supabaseClient.auth.updateUser({data: {"phone": 'hiyahiyahiya'}}).then((response) => console.log(response))
   const router = useRouter();
   supabaseClient.auth.getSession().then((res) => console.log(res))
   const titleColor = isLoggedIn ? 'text-white-500' : 'text-gray-700';
@@ -132,8 +131,9 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
   const user = useUser();
+  console.log(user)
   const supabaseClient = useSupabaseClient();
-  const [value, setValue] = useState("");
+  const [number, setNumber] = useState("");
   const [style, setStyle] = useState("");
 
   useEffect(() => {
@@ -197,36 +197,66 @@ const LoginPage: NextPage = () => {
   }
 
   const updateUserInfo = () => {
-    supabaseClient.auth.updateUser({data: {"phone": value, "style": style}}).then((res) => console.log(res))
+    console.log(style)
+    var phone_number = number
+    if (number.length == 10) {
+      phone_number = "+1" + number
+    } else if (number.length > 10 && number[0] != "+") {
+      phone_number = "+" + number
+    }
+    console.log(phone_number)
+    supabaseClient.auth.updateUser({data: {"phone": phone_number, "style": style}}).then((res) => console.log(res))
+  }
+
+  const setVals = (value: String | null) => {
+     if (value == null) {
+        setStyle("classic")
+     }
+     var strValue = String(value)
+     setStyle(strValue)
+  }
+
+  if (!! user?.user_metadata["nonexistent"]) {
+    return (
+      <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
+        <Header isLoggedIn={Boolean(session)} />
+  
+        <Center>
+          <Stack>
+            <Title>Enter a little information below to get started.</Title>
+            <TextInput
+              label={<Text color="white">Phone Number</Text>}
+              placeholder="+10000000000"
+              value={number}
+              onChange={(event) => setNumber(event.currentTarget.value)}
+            />
+            <Space h="md"/>
+            <Select
+              label={<Text color="white">Preferred style</Text>}
+              placeholder="Pick one"
+              onChange={(value) => setVals(value)}
+              data={[
+                { value: "classic", label: "Classic Twitter" },
+                { value: "informative", label: "Informative" },
+                { value: "questions", label: "Thought-provoking Questions" },
+              ]
+            }
+            />
+            <Space h="md"/>
+            <Button variant="white" compact color="gray" size="xl" onClick={updateUserInfo}>Enter Feed</Button>
+          </Stack>
+        </Center>
+    </div>
+    );
   }
 
   return (
     <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
       <Header isLoggedIn={Boolean(session)} />
 
-      <Center>
-        <Stack>
-          <Title>Enter a little information below to get started.</Title>
-          <TextInput
-            label={<Text color="white">Phone Number</Text>}
-            placeholder="+10000000000"
-            value={value}
-            onChange={(event) => setValue(event.currentTarget.value)}
-          />
-          <Space h="md"/>
-          <Select
-            label={<Text color="white">Preferred style</Text>}
-            placeholder="Pick one"
-            data={[
-              { value: "classic", label: "Classic Twitter" },
-              { value: "informative", label: "Informative" },
-              { value: "questions", label: "Thought-provoking Questions" },
-            ]}
-          />
-          <Space h="md"/>
-          <Button variant="white" compact color="gray" size="xl" onClick={updateUserInfo}>Enter Feed</Button>
-        </Stack>
-      </Center>
+      <div className="h-2000vh overflow-hidden">
+        <Feed />
+      </div>
   </div>
   );
 };
