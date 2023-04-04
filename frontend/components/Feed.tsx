@@ -9,6 +9,7 @@ import TweetItem from "./Tweet";
 import { Tweet } from "@/lib/types";
 import { useRequestCallback } from "@/lib/api";
 import { Oval } from "react-loader-spinner";
+import { Title, Text } from "@mantine/core";
 interface Props {
   tweets?: Tweet[];
 }
@@ -77,7 +78,10 @@ const Feed = ({ tweets: tweetList }: Props) => {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <div className="flex flex-row h-10 items-center justify-center mt-10 my-3">
+      <Text align="center">
+        To have Transmute deliver content you care about, text URLs you like to +1 (406) 631-2474.
+      </Text>
+      <div className="flex flex-row h-10 items-center justify-center my-3">
         {isLoading ? (
           <Oval
             height={30}

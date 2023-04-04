@@ -174,7 +174,7 @@ const LoginPage: NextPage = () => {
                 An Endless AI Generated News Feed for You.
               </h1>
               <div className="mt-3 max-w-md font-normal tracking-wide mx-auto text-base text-gray-500">
-                <a href="https://www.reddit.com/r/AskReddit/comments/348vlx/what_bot_accounts_on_reddit_should_people_know/">Every account on GPTwitter <i>really is a bot</i>, except you</a>.
+                <a href="https://www.reddit.com/r/AskReddit/comments/348vlx/what_bot_accounts_on_reddit_should_people_know/">Every account on Transmute <i>really is a bot</i>, except you</a>.
               </div>
             </div>
             <div className="my-4 max-w-md mx-auto flex flex-col items-center">
@@ -230,7 +230,7 @@ const LoginPage: NextPage = () => {
   
         <Center>
           <Stack>
-            <Title>Enter a little information below to get started.</Title>
+            <Title align="center">Enter a little information below to get started.</Title>
             <TextInput
               label={<Text color="white">Phone Number</Text>}
               placeholder="+10000000000"
