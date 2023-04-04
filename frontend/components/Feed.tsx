@@ -24,15 +24,15 @@ const Feed = ({ tweets: tweetList }: Props) => {
   const regenerateTweet = useRequestCallback('/regenerate');
   const [hover, setHover] = useState(false)
 
-  useEffect(() => {
-    setChangeStyle(useRequestCallback('/changeStyle/${style}'));
-  }, [style])
+  // useEffect(() => {
+  //   setChangeStyle(useRequestCallback('/changeStyle/${style}'));
+  // }, [style])
 
-  useEffect(() => {
-    if (changeStyle) {
-      changeStyle();
-    }
-  }, [changeStyle])
+  // useEffect(() => {
+  //   if (changeStyle) {
+  //     changeStyle();
+  //   }
+  // }, [changeStyle])
 
   supabaseClient.auth.getSession().then((res) => console.log(res))
 

@@ -131,6 +131,7 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
   const user = useUser();
+  const router = useRouter();
   console.log(user)
   const supabaseClient = useSupabaseClient();
   const [number, setNumber] = useState("");
@@ -205,7 +206,8 @@ const LoginPage: NextPage = () => {
       phone_number = "+" + number
     }
     console.log(phone_number)
-    supabaseClient.auth.updateUser({data: {"phone": phone_number, "style": style}}).then((res) => console.log(res))
+    supabaseClient.auth.updateUser(
+      {data: {"again": "val"}}).then((res) => console.log(res)).then(() => router.push('/'))
   }
 
   const setVals = (value: String | null) => {
@@ -216,7 +218,8 @@ const LoginPage: NextPage = () => {
      setStyle(strValue)
   }
 
-  if (!! user?.user_metadata["nonexistent"]) {
+  console.log("Value Again")
+  if (user?.user_metadata["again"] == null) {
     return (
       <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
         <Header isLoggedIn={Boolean(session)} />
