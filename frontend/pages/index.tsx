@@ -16,6 +16,7 @@ import { Center, Button, TextInput, Select, Stack, Space, Text, Title } from "@m
 
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
+import { SupabaseClient, User } from '@supabase/supabase-js';
 
 export type Theme =
   | 'primary'
@@ -97,11 +98,9 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
 };
 
 
-const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
-  const supabaseClient = useSupabaseClient();
-  // supabaseClient.auth.getSession().then((response) => console.log(response))
+const Header = ({ isLoggedIn, supabaseClient }: { isLoggedIn: boolean, supabaseClient: SupabaseClient<any, "public", any> | undefined }) => {
   const router = useRouter();
-  supabaseClient.auth.getSession().then((res) => console.log(res))
+  supabaseClient?.auth.getSession().then((res) => console.log(res))
   const titleColor = isLoggedIn ? 'text-white-500' : 'text-gray-700';
 
   return (
@@ -115,7 +114,7 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
               <CustomButton
                 className="px-4 py-2"
                 onClick={async () => {
-                  await supabaseClient.auth.signOut();
+                  await supabaseClient?.auth.signOut();
                   router.push('/');
                 }}
               >
@@ -130,26 +129,28 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 
 const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
-  const user = useUser();
+  //const user = useUser();
   const router = useRouter();
-  console.log(user)
   const supabaseClient = useSupabaseClient();
   const [number, setNumber] = useState("");
   const [style, setStyle] = useState("");
+  const [user, setUser] = useState<User | null>();
 
   useEffect(() => {
-    const timeout = setInterval(() => {
-      supabaseClient.auth.refreshSession()
-    }, 5 * 60 * 1000);
-    return () => {
-      clearInterval(timeout);
-    }
-  }, [user, supabaseClient]);
+    supabaseClient.auth.refreshSession()
+      .then(({ data, error }) => {
+        const { user } = data;
+        setUser(user);
+        console.log("SETTING USER");
+        console.log(user);
+        console.log(supabaseClient);
+      })
+  }, [supabaseClient]);
 
   if (!session) {
     return (
       <div className="w-screen h-screen">
-        <Header isLoggedIn={Boolean(session)} />
+        <Header isLoggedIn={Boolean(session)} supabaseClient={supabaseClient} />
         {isLoading ? (
           <div className="h-60 flex items-center justify-center">
             <Oval
@@ -197,17 +198,21 @@ const LoginPage: NextPage = () => {
     );
   }
 
-  const updateUserInfo = () => {
-    console.log(style)
-    var phone_number = number
+  const updateUserInfo = async () => {
+    var phone_number = number;
     if (number.length == 10) {
-      phone_number = "+1" + number
+      phone_number = "+1" + number;
     } else if (number.length > 10 && number[0] != "+") {
-      phone_number = "+" + number
+      phone_number = "+" + number;
     }
-    console.log(phone_number)
-    supabaseClient.auth.updateUser(
-      {data: {"again": "val"}}).then((res) => console.log(res)).then(() => router.push('/'))
+    console.log(phone_number);
+    console.log("BEFORE");
+    const res = await supabaseClient.auth.updateUser({data: {"nonexistent2": "val"}});
+    console.log("AFTER");
+    console.log(res);
+    const { data, error } = await supabaseClient.auth.refreshSession();
+    const { session, user } = data;
+    setUser(user);
   }
 
   const setVals = (value: String | null) => {
@@ -218,11 +223,10 @@ const LoginPage: NextPage = () => {
      setStyle(strValue)
   }
 
-  console.log("Value Again")
-  if (user?.user_metadata["again"] == null) {
+  if (!user?.user_metadata["nonexistent2"]) {
     return (
       <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
-        <Header isLoggedIn={Boolean(session)} />
+        <Header isLoggedIn={Boolean(session)} supabaseClient={supabaseClient} />
   
         <Center>
           <Stack>
@@ -255,7 +259,7 @@ const LoginPage: NextPage = () => {
 
   return (
     <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
-      <Header isLoggedIn={Boolean(session)} />
+      <Header isLoggedIn={Boolean(session)} supabaseClient={supabaseClient} />
 
       <div className="h-2000vh overflow-hidden">
         <Feed />
