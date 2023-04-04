@@ -1,4 +1,9 @@
-import React, { useState, useCallback } from "react";
+import {
+  useSessionContext,
+  useSupabaseClient,
+  useUser
+} from '@supabase/auth-helpers-react';
+import React, { useState, useCallback, useEffect } from "react";
 import TweetItem from "./Tweet";
 import { Tweet } from "@/lib/types";
 import { useRequestCallback } from "@/lib/api";
@@ -8,12 +13,19 @@ interface Props {
 }
 
 const Feed = ({ tweets: tweetList }: Props) => {
+  const supabaseClient = useSupabaseClient();
   const [tweets, setTweets] = useState(tweetList ?? []);
   const [isLoading, setIsLoading] = useState(false);
-  const [isReset, setIsReset] = useState(false)
+  const [isReset, setIsReset] = useState(false);
+  const [style, setStyle] = useState('classic');
   const generateTweet = useRequestCallback('/generate');
   const regenerateTweet = useRequestCallback('/regenerate');
+  const changeStyle = useRequestCallback('/changeStyle');
   const [hover, setHover] = useState(false)
+
+  useEffect(() => {
+    changeStyle(style);
+  }, [style])
 
   const handleGenerate = useCallback(() => {
     setIsLoading(true);
@@ -90,6 +102,13 @@ const Feed = ({ tweets: tweetList }: Props) => {
             </button>
         </div> : <></>
       }
+      <div className="flex flex-row h-10 items-center justify-center">
+        <select name="style" id="style" onChange={(e) => setStyle(e.target.value)}>
+          <option value="classic">Classic Twitter</option>
+          <option value="informative">Informative</option>
+          <option value="questions">Questions</option>
+        </select>
+      </div>
       {isReset? 
           <Oval
               height={30}
