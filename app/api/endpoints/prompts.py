@@ -103,15 +103,17 @@ Style Example:
 Guidelines for writing tweet:
 - only use content from the insights above
 - be specific in the tweet that you do write
+- minimize use of emojis
 - do not use content from the style examples above
 - Use a style and tone that imitates the style examples above
 - Use similar puns, idioms, jokes, and pop culture references as the style examples above
 - Write with a personality that imitates the style examples above
+- focus on a single logical idea, prediction, or statement in your tweet 
 
 Output format (json): 
 {{
-    "tweet": the content of the tweet.
-    "user_name": @the user name of the tweeter
+    "tweet": "the content of the tweet",
+    "user_name": "@the user name of the tweeter"
 }}.
 
 Output:
@@ -124,3 +126,70 @@ insight_tmpl = PromptTemplate(
     template=style_transfer_to_insight_prompt,
 )
 insight_style_chain = LLMChain(llm=llm, prompt=insight_tmpl, verbose=True)
+
+insightful_comment_prompt = """Write a tweet phrased as a deep, insightful comment on the content of the following insights in the style of the example provide.
+
+Insights:
+{insights}
+
+Style Example:
+{style_samples}
+
+Guidelines for writing tweet:
+- only use content from the insights above
+- be specific in the tweet that you do write
+- minimize use of emojis
+- do not use content from the style examples above
+- Use a style and tone that imitates the style examples above
+- Use similar puns, idioms, jokes, and pop culture references as the style examples above
+- Write with a personality that imitates the style examples above
+- focus on a single logical idea, prediction, or statement in your tweet 
+
+Output format (json): 
+{{
+    "tweet": "the content of the tweet, phrased as an insightful comment",
+    "user_name": "@the user name of the tweeter"
+}}.
+
+Output:
+"""
+
+insightful_comment_tmpl = PromptTemplate(
+    input_variables=["insights", "style_samples"],
+    template=insightful_comment_prompt,
+)
+insightful_comment_chain = LLMChain(llm=llm, prompt=insightful_comment_tmpl, verbose=True)
+
+
+better_question_prompt = """Write a tweet phrased as an insightful question on the content of the following insights in the style of the example provide.
+
+Insights:
+{insights}
+
+Style Example:
+{style_samples}
+
+Guidelines for writing tweet:
+- only use content from the insights above
+- be specific in the tweet that you do write
+- minimize use of emojis
+- do not use content from the style examples above
+- Use a style and tone that imitates the style examples above
+- Use similar puns, idioms, jokes, and pop culture references as the style examples above
+- Write with a personality that imitates the style examples above
+- focus on a single logical idea, prediction, or statement in your tweet 
+
+Output format (json): 
+{{
+    "tweet": "the content of the tweet, phrased as an insightful question",
+    "user_name": "@the user name of the tweeter"
+}}.
+
+Output:
+"""
+
+better_question_tmpl = PromptTemplate(
+    input_variables=["insights", "style_samples"],
+    template=better_question_prompt,
+)
+better_question_chain = LLMChain(llm=llm, prompt=better_question_tmpl, verbose=True)

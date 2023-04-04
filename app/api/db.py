@@ -3,6 +3,7 @@ import random
 from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 import requests
+from gotrue.types import User
 
 from app.config import key, url, second_url, second_key
 from supabase import Client, create_client
@@ -15,6 +16,11 @@ from app.constants import (
     IMPRESSION_TABLE_TWEET_ID,
     IMPRESSION_TABLE_USER_ID,
     SEED_TWEET_IDS,
+    INSIGHTFUL_STYLE,
+    QUESTION_STYLE,
+    DEFAULT_STYLE,
+    INSIGHTFUL_TWEET_IDS,
+    INTERESTING_QUESTION_TWEET_IDS,
     SUPABASE_TRUE_VAL,
     TWEET_TABLE_ID,
     TWEET_TABLE_NAME,
@@ -29,15 +35,19 @@ def get_seed_impressions(
 ) -> List[dict]:
     """Return all seed impressions."""
     supabase: Client = create_client(url, key)
+    IDS = SEED_TWEET_IDS
+    IDS.extend(INSIGHTFUL_TWEET_IDS)
+    IDS.extend(INTERESTING_QUESTION_TWEET_IDS)
     impressions = (
         supabase.table("Impression")
         .select("*")
         .filter(IMPRESSION_TABLE_USER_ID, "eq", user_id)
-        .filter(IMPRESSION_TABLE_TWEET_ID, "in", tuple(SEED_TWEET_IDS))
+        .filter(IMPRESSION_TABLE_TWEET_ID, "in", tuple(IDS))
         .filter(IMPRESSION_TABLE_CREATED_TIME, "gt", regen_time)
         .execute()
         .data
     )
+    print(impressions)
     return impressions
 
 
@@ -57,10 +67,29 @@ def get_user_impressions(
     return impressions
 
 
-def seed_impressions(user_id: str) -> None:
+def seed_impressions(user: User) -> None:
     """Add initial impressions for a new user."""
+    user_id = user.id
+    user_style = user.user_metadata.get("style", DEFAULT_STYLE)
     supabase: Client = create_client(url, key)
-    tweets_to_use = random.sample(SEED_TWEET_IDS, k=20)
+
+    OTHER_TWEETS_TO_SAMPLE_FROM = [INSIGHTFUL_TWEET_IDS, INTERESTING_QUESTION_TWEET_IDS]
+    BASE_TWEET_TO_SAMPLE = SEED_TWEET_IDS
+    print(f"USER STYLE: {user_style}")
+
+    if user_style == INSIGHTFUL_STYLE:
+        BASE_TWEET_TO_SAMPLE = INSIGHTFUL_TWEET_IDS
+        OTHER_TWEETS_TO_SAMPLE_FROM = [INTERESTING_QUESTION_TWEET_IDS]
+    elif user_style == QUESTION_STYLE:
+        BASE_TWEET_TO_SAMPLE = INTERESTING_QUESTION_TWEET_IDS
+        OTHER_TWEETS_TO_SAMPLE_FROM = []
+
+    tweets_to_use = random.sample(BASE_TWEET_TO_SAMPLE, k=20)
+    # Add 5 more tweets from the other options
+    for alternate_tweets_list in OTHER_TWEETS_TO_SAMPLE_FROM:
+        alternate_tweets = random.sample(alternate_tweets_list, k=5)
+        tweets_to_use.extend(alternate_tweets)
+
     for tweet_id in tweets_to_use:
         impression = {
             IMPRESSION_TABLE_USER_ID: user_id,
@@ -210,7 +239,7 @@ def get_all_friends(user_num: str) -> List[dict]:
     return friends
 
 
-def get_mashed_feed_insight(user_num: str) -> Tuple[str, Optional[str]]:
+def get_mashed_feed_insight(user_num: str) -> Tuple[str, Optional[dict]]:
     """Get an insight from you or one of your friends.
 
     First choose a random insight from either you or your friend. If nothing
@@ -230,7 +259,7 @@ def get_mashed_feed_insight(user_num: str) -> Tuple[str, Optional[str]]:
     return num_to_use, insight
 
 
-def get_random_insight(user_num: str) -> Optional[str]:
+def get_random_insight(user_num: str) -> Optional[dict]:
     """Get random insight from user num provided."""
     user_num = user_num.replace("+", "%2B")
     token = f"Bearer {second_key}"
