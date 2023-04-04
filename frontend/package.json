@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.6.0",
     "@next/font": "13.1.4",
     "@supabase/auth-helpers-nextjs": "^0.5.4",
     "@supabase/auth-helpers-react": "^0.3.1",
@@ -19,6 +20,12 @@
     "@types/react-dom": "18.0.10",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.4",
+    "@mantine/core": "^5.9.5",
+    "@mantine/dropzone": "^5.9.5",
+    "@mantine/form": "^5.9.5",
+    "@mantine/hooks": "^5.9.5",
+    "@mantine/notifications": "^5.9.5",
+    "@mantine/prism": "^5.9.5",
     "next": "13.1.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",

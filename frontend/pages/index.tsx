@@ -12,6 +12,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Oval } from "react-loader-spinner";
 import { themes } from '../utils/styles';
 import { twMerge } from 'tailwind-merge';
+import { Center, Button, TextInput, Select, Stack, Space, Text, Title } from "@mantine/core";
 
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
@@ -53,7 +54,7 @@ const Card = (
   return <div className={classNames}>{children}</div>
 }
 
-const Button = ({ className, ...props }: React.ComponentProps<'button'>) => {
+const CustomButton = ({ className, ...props }: React.ComponentProps<'button'>) => {
   const buttonStyle = `
     inline-flex items-center justify-center
     border border-transparent
@@ -80,7 +81,7 @@ const Button = ({ className, ...props }: React.ComponentProps<'button'>) => {
 const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) => {
   const supabaseClient = useSupabaseClient();
   return (
-    <Button
+    <CustomButton
       className="flex px-4 py-2 items-center justify-center"
       onClick={() => {
         supabaseClient.auth.signInWithOAuth({
@@ -91,7 +92,7 @@ const TwitterLogin = ({ text, icon = false }: { text: string, icon?: boolean }) 
     >
       {icon && <div className="text-cyan-500 pr-2"><FaTwitter /></div>}
       <span>{text}</span>
-    </Button>
+    </CustomButton>
   )
 };
 
@@ -112,7 +113,7 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
           </div>
           <div className="flex flex-row items-center">
             {!isLoggedIn ? <TwitterLogin text="Login" /> : (
-              <Button
+              <CustomButton
                 className="px-4 py-2"
                 onClick={async () => {
                   await supabaseClient.auth.signOut();
@@ -120,7 +121,7 @@ const Header = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                 }}
               >
                 Logout
-              </Button>
+              </CustomButton>
             )}
           </div>
         </nav>
@@ -132,7 +133,8 @@ const LoginPage: NextPage = () => {
   const { isLoading, session, error } = useSessionContext();
   const user = useUser();
   const supabaseClient = useSupabaseClient();
-  const [value, setValue] = useState()
+  const [value, setValue] = useState("");
+  const [style, setStyle] = useState("");
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -194,25 +196,37 @@ const LoginPage: NextPage = () => {
     );
   }
 
-  const updateUserNumber = () => {
-    supabaseClient.auth.updateUser({data: {"phone": value}}).then((res) => console.log(res))
+  const updateUserInfo = () => {
+    supabaseClient.auth.updateUser({data: {"phone": value, "style": style}}).then((res) => console.log(res))
   }
 
   return (
     <div className="min-w-screen w-full min-h-screen h-full bg-[#15202b] text-white">
       <Header isLoggedIn={Boolean(session)} />
 
-      <div className="h-2000vh overflow-hidden">
-        {/* <Feed /> */}
-        <PhoneInput
-          placeholder="Enter phone number"
-          defaultCountry={"US"}
-          value={value}
-          onChange={setValue}
-          style={{ color: 'black' }}
-        />
-        <button onClick={updateUserNumber}>Update Number</button>
-      </div>
+      <Center>
+        <Stack>
+          <Title>Enter a little information below to get started.</Title>
+          <TextInput
+            label={<Text color="white">Phone Number</Text>}
+            placeholder="+10000000000"
+            value={value}
+            onChange={(event) => setValue(event.currentTarget.value)}
+          />
+          <Space h="md"/>
+          <Select
+            label={<Text color="white">Preferred style</Text>}
+            placeholder="Pick one"
+            data={[
+              { value: "classic", label: "Classic Twitter" },
+              { value: "informative", label: "Informative" },
+              { value: "questions", label: "Thought-provoking Questions" },
+            ]}
+          />
+          <Space h="md"/>
+          <Button variant="white" compact color="gray" size="xl" onClick={updateUserInfo}>Enter Feed</Button>
+        </Stack>
+      </Center>
   </div>
   );
 };
