@@ -25,7 +25,9 @@ from app.api.endpoints.prompts import (
     liked_prefix,
     liked_suffix,
     user_spec,
-    insight_style_chain
+    insight_style_chain,
+    better_question_chain,
+    insightful_comment_chain
 )
 from app.config import key, url
 from gotrue.types import User
@@ -38,8 +40,12 @@ from app.constants import (
     TWEET_TABLE_CONTENT,
     TWEET_TABLE_ID,
     TWEET_TABLE_METADATA,
+    DEFAULT_STYLE,
+    QUESTION_STYLE,
+    INSIGHTFUL_STYLE,
     TWEET_TABLE_NAME,
     SUMMARY_TABLE_SYNTHESIS,
+    SUMMARY_TABLE_MAIN_SUMMARY,
     TWEET_METADATA_ORIGIN_USER_NUM
 )
 
@@ -59,16 +65,17 @@ def generate(
 def generate_post(current_user: User, regen_time: datetime = datetime.min) -> dict:
     user_id = str(current_user.id)
     user_num = current_user.user_metadata.get("phone", "")
+    user_style = current_user.user_metadata.get("style", DEFAULT_STYLE)
     print(f"User number: {user_num}")
 
     supabase: Client = create_client(url, key)
     impressions = get_user_impressions(user_id, regen_time)
     if len(impressions) == 0:
-        seed_impressions(user_id)
+        seed_impressions(current_user)
         impressions = get_seed_impressions(user_id, regen_time)
 
     random_val = random.uniform(0, 1)
-    use_pregenerated = len(impressions) < 30 and random_val < 0.25
+    use_pregenerated = len(impressions) < 20 and random_val < 0.2
     if use_pregenerated:
         tweet = get_pregenerated_tweet()
         likes = get_tweet_likes(tweet[TWEET_TABLE_ID])
@@ -87,7 +94,7 @@ def generate_post(current_user: User, regen_time: datetime = datetime.min) -> di
         use_insights = random_val < 1
         tweet = None
         if use_insights:
-            tweet = generate_insight_tweet(chosen_impressions, user_num)
+            tweet = generate_insight_tweet(chosen_impressions, user_style, user_num)
             print(tweet)
 
         # If no insights generated from insight tweet, or use_insights not
@@ -149,7 +156,17 @@ def choose_impressions(weights: List[float], impressions: List[dict]) -> List[di
     return chosen_impressions
 
 
-def generate_insight_tweet(impressions: List[dict], user_num: str = "") -> Optional[dict]:
+def choose_proper_synthesis_base(insight: dict) -> str:
+    """Choose from summary, insight, or combination."""
+    synthesis = insight[SUMMARY_TABLE_SYNTHESIS]
+    summary = insight[SUMMARY_TABLE_MAIN_SUMMARY]
+    if len(synthesis) == 0:
+        return summary
+    combined_info = f"{summary}\n{synthesis}"
+    return random.choice([synthesis, summary, combined_info])
+
+
+def generate_insight_tweet(impressions: List[dict], user_style: str = DEFAULT_STYLE, user_num: str = "") -> Optional[dict]:
     """Generate insight twee."""
     num_used, insight = get_mashed_feed_insight(user_num)
     print(num_used)
@@ -157,13 +174,27 @@ def generate_insight_tweet(impressions: List[dict], user_num: str = "") -> Optio
     if insight is None:
         return None
 
-    synthesis = insight[SUMMARY_TABLE_SYNTHESIS]
-    print(synthesis)
-    insights_dict = {"insights": synthesis, "style_samples": str(impressions)}
-    insight_transfer = insight_style_chain(insights_dict)["text"]
+    tweets = {}
+    for i in range(2):
+        try:
+            insight = choose_proper_synthesis_base(insight)
+            examples = convert_impressions_to_examples(impressions)
+            print(insight)
 
-    print(insight_transfer)
-    tweets = json.loads(insight_transfer)
+            chain = insight_style_chain
+            if user_style == QUESTION_STYLE:
+                chain = better_question_chain
+            elif user_style == INSIGHTFUL_STYLE:
+                chain = insightful_comment_chain
+            insights_dict = {"insights": insight, "style_samples": str(examples)}
+            insight_transfer = chain(insights_dict)["text"]
+            print(insight_transfer)
+            tweets = json.loads(insight_transfer)
+        except:
+            continue
+
+    if len(tweets) == 0:
+        return None
 
     impression_ids = [
         impression[IMPRESSION_TABLE_TWEET_ID] for impression in impressions
