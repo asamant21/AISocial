@@ -14,4 +14,3 @@ api_router.include_router(
 api_router.include_router(
     retrieve_likes.router, prefix="/retrieve-likes", tags=["retrieve liked tweets"]
 )
-

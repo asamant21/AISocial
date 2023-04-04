@@ -1,5 +1,5 @@
-from langchain.chat_models import ChatOpenAI
 from langchain import LLMChain
+from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 
 #### GENERIC TWEET PROMPT PIECES
@@ -120,7 +120,10 @@ Output:
 """
 
 import os
-llm = ChatOpenAI(model_name="gpt-4", max_tokens=500, openai_api_key=os.environ["SECOND_KEY"])
+
+llm = ChatOpenAI(
+    model_name="gpt-4", max_tokens=500, openai_api_key=os.environ["SECOND_KEY"]
+)
 insight_tmpl = PromptTemplate(
     input_variables=["insights", "style_samples"],
     template=style_transfer_to_insight_prompt,
@@ -158,7 +161,9 @@ insightful_comment_tmpl = PromptTemplate(
     input_variables=["insights", "style_samples"],
     template=insightful_comment_prompt,
 )
-insightful_comment_chain = LLMChain(llm=llm, prompt=insightful_comment_tmpl, verbose=True)
+insightful_comment_chain = LLMChain(
+    llm=llm, prompt=insightful_comment_tmpl, verbose=True
+)
 
 
 better_question_prompt = """Write a tweet phrased as an insightful question on the content of the following insights in the style of the examples provide.

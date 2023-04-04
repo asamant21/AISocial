@@ -2,12 +2,17 @@
 import random
 from datetime import datetime, timezone
 from typing import List, Optional, Tuple
+
 import requests
 from gotrue.types import User
-
-from app.config import key, url, second_url, second_key
 from supabase import Client, create_client
+
+from app.config import key, second_key, second_url, url
 from app.constants import (
+    DEFAULT_STYLE,
+    FRIEND_TABLE_FRIEND_NUM,
+    FRIEND_TABLE_NAME,
+    FRIEND_TABLE_USER_NUM,
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_CREATED_TIME,
     IMPRESSION_TABLE_ID,
@@ -15,18 +20,14 @@ from app.constants import (
     IMPRESSION_TABLE_NAME,
     IMPRESSION_TABLE_TWEET_ID,
     IMPRESSION_TABLE_USER_ID,
-    SEED_TWEET_IDS,
     INSIGHTFUL_STYLE,
-    QUESTION_STYLE,
-    DEFAULT_STYLE,
     INSIGHTFUL_TWEET_IDS,
     INTERESTING_QUESTION_TWEET_IDS,
+    QUESTION_STYLE,
+    SEED_TWEET_IDS,
     SUPABASE_TRUE_VAL,
     TWEET_TABLE_ID,
     TWEET_TABLE_NAME,
-    FRIEND_TABLE_FRIEND_NUM,
-    FRIEND_TABLE_NAME,
-    FRIEND_TABLE_USER_NUM,
 )
 
 
@@ -274,4 +275,3 @@ def get_random_insight(user_num: str) -> Optional[dict]:
     if len(vals) > 0:
         return vals[0]
     return None
-

@@ -7,9 +7,9 @@ from fastapi import Header, HTTPException, status
 from gotrue import UserAttributes
 from gotrue.helpers import parse_user_response
 from gotrue.types import User
+from supabase import Client, create_client
 
 from app.config import key, url
-from supabase import Client, create_client
 
 
 def get_current_user(authorization: str = Header(None)) -> User:

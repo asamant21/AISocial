@@ -6,47 +6,47 @@ from typing import List, Optional
 
 import numpy as np
 from fastapi import APIRouter, Depends
+from gotrue.types import User
 from langchain.llms import OpenAI
 from supabase import Client, create_client
 
 from app.api import deps, schemas
 from app.api.db import (
+    get_mashed_feed_insight,
     get_pregenerated_tweet,
     get_seed_impressions,
     get_tweet,
     get_tweet_likes,
     get_user_impressions,
     seed_impressions,
-    get_mashed_feed_insight
 )
 from app.api.endpoints.prompts import (
+    better_question_chain,
     day_quote,
     eg_prompt,
+    insight_style_chain,
+    insightful_comment_chain,
     liked_prefix,
     liked_suffix,
     user_spec,
-    insight_style_chain,
-    better_question_chain,
-    insightful_comment_chain
 )
 from app.config import key, url
-from gotrue.types import User
 from app.constants import (
+    DEFAULT_STYLE,
     IMPRESSION_TABLE_CHILD_LIKE_COUNT,
     IMPRESSION_TABLE_LIKED,
     IMPRESSION_TABLE_TWEET_ID,
+    INSIGHTFUL_STYLE,
+    QUESTION_STYLE,
+    SUMMARY_TABLE_MAIN_SUMMARY,
+    SUMMARY_TABLE_SYNTHESIS,
+    TWEET_METADATA_ORIGIN_USER_NUM,
     TWEET_METADATA_PROMPT_TWEET_IDS,
     TWEET_TABLE_AUTHOR,
     TWEET_TABLE_CONTENT,
     TWEET_TABLE_ID,
     TWEET_TABLE_METADATA,
-    DEFAULT_STYLE,
-    QUESTION_STYLE,
-    INSIGHTFUL_STYLE,
     TWEET_TABLE_NAME,
-    SUMMARY_TABLE_SYNTHESIS,
-    SUMMARY_TABLE_MAIN_SUMMARY,
-    TWEET_METADATA_ORIGIN_USER_NUM
 )
 
 router = APIRouter()
@@ -166,7 +166,9 @@ def choose_proper_synthesis_base(insight: dict) -> str:
     return random.choice([synthesis, summary, combined_info])
 
 
-def generate_insight_tweet(impressions: List[dict], user_style: str = DEFAULT_STYLE, user_num: str = "") -> Optional[dict]:
+def generate_insight_tweet(
+    impressions: List[dict], user_style: str = DEFAULT_STYLE, user_num: str = ""
+) -> Optional[dict]:
     """Generate insight twee."""
     num_used, insight = get_mashed_feed_insight(user_num)
     print(num_used)

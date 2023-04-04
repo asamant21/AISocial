@@ -2,9 +2,9 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends
+from gotrue.types import User
 
 from app.api import deps, schemas
-from gotrue.types import User
 from app.api.endpoints.generate import generate_post
 
 router = APIRouter()
